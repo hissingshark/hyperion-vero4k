@@ -8,10 +8,10 @@ cd
 git clone --recursive https://github.com/hyperion-project/hyperion.git
 
 # configure and build
+# this uses the 2 internal grabbers, not a USB grabber
 cd hyperion/
 mkdir build
 cd build
-cmake -DENABLE_DISPMANX=OFF -DENABLE_SPIDEV=OFF -DENABLE_AMLOGIC=ON -DENABLE_FB=ON -DENABLE_QT5=ON -DCMAKE_BUILD_TYPE=Release -Wno-dev ..
 cmake -DENABLE_V4L2=OFF -DENABLE_AMLOGIC=ON -DENABLE_FB=ON -DENABLE_QT5=ON -DCMAKE_BUILD_TYPE=Release -Wno-dev ..
 make -j4
 
