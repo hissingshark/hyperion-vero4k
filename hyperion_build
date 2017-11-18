@@ -1,31 +1,47 @@
 #!/bin/bash
 
+# get build depends
 sudo apt-get install -y git build-essential qt5-default
 
+# get source
 cd
 git clone --recursive https://github.com/hyperion-project/hyperion.git
 
+# configure and build
 cd hyperion/
 mkdir build
-
 cd build
 cmake -DENABLE_DISPMANX=OFF -DENABLE_SPIDEV=OFF -DENABLE_AMLOGIC=ON -DENABLE_FB=ON -DENABLE_QT5=ON -DCMAKE_BUILD_TYPE=Release -Wno-dev ..
 cmake -DENABLE_V4L2=OFF -DENABLE_AMLOGIC=ON -DENABLE_FB=ON -DENABLE_QT5=ON -DCMAKE_BUILD_TYPE=Release -Wno-dev ..
-
 make -j4
 
+# install binaries
 cd bin
 sudo cp * /usr/bin
 
-cd ..
+# install configs
+cd ../..
 sudo mkdir /usr/share/hyperion
 sudo cp -r effects /usr/share/
+sudo mkdir /etc/hyperion
+sudo cp config/hyperion.config.json.example /etc/hyperion.config.json
 
-cp 
-To run
+# remove the kodi breaking qt from the build
 sudo apt-get remove -y qt5-default
 sudo apt-get autoremove -y
+# but install the acceptable qt needed at runtime
 sudo apt-get install -y libqt5core5a libqt5gui5 libqt5widgets5 libqt5network5
 
-https://downloads.sourceforge.net/project/hyperion-project/hypercon/HyperCon.jar?r=https%3A%2F%2Fwww.google.co.uk%2F&ts=1510988048&use_mirror=netix
-rename to Hypercon.jar
+
+# setup the service
+cd ..
+cp hyperion.service /etc/systemd/system/
+sudo systemctl daemon-reload
+cd
+
+# that's it - start hyperion with 
+# sudo systemctl start hyperion
+
+# install the configuration utility on another device
+# wget https://downloads.sourceforge.net/project/hyperion-project/hypercon/HyperCon.jar?r=https%3A%2F%2Fwww.google.co.uk%2F&ts=1510988048&use_mirror=netix
+# rename to Hypercon.jar
