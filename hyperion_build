@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo apt-get install -y libqt5-default
+sudo apt-get install -y git build-essential qt5-default
 
 cd
 git clone --recursive https://github.com/hyperion-project/hyperion.git
@@ -10,6 +10,8 @@ mkdir build
 
 cd build
 cmake -DENABLE_DISPMANX=OFF -DENABLE_SPIDEV=OFF -DENABLE_AMLOGIC=ON -DENABLE_FB=ON -DENABLE_QT5=ON -DCMAKE_BUILD_TYPE=Release -Wno-dev ..
+cmake -DENABLE_V4L2=OFF -DENABLE_AMLOGIC=ON -DENABLE_FB=ON -DENABLE_QT5=ON -DCMAKE_BUILD_TYPE=Release -Wno-dev ..
+
 make -j4
 
 cd bin
@@ -20,5 +22,10 @@ sudo mkdir /usr/share/hyperion
 sudo cp -r effects /usr/share/
 
 cp 
-To run install 
-libqt5core5a libqt5gui5 libqt5widgets5 libqt5network5
+To run
+sudo apt-get remove -y qt5-default
+sudo apt-get autoremove -y
+sudo apt-get install -y libqt5core5a libqt5gui5 libqt5widgets5 libqt5network5
+
+https://downloads.sourceforge.net/project/hyperion-project/hypercon/HyperCon.jar?r=https%3A%2F%2Fwww.google.co.uk%2F&ts=1510988048&use_mirror=netix
+rename to Hypercon.jar
