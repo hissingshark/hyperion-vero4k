@@ -30,7 +30,7 @@ sudo cp config/hyperion.config.json.example /etc/hyperion.config.json
 sudo apt-get remove -y qt5-default
 sudo apt-get autoremove -y
 # but install the acceptable qt needed at runtime
-sudo apt-get install -y libqt5core5a libqt5gui5 libqt5widgets5 libqt5network5
+sudo apt-get install -y libqt5core5a libqt5gui5 libqt5widgets5 libqt5network5 libusb-1.0-0
 
 
 # setup the service
