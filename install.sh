@@ -87,6 +87,7 @@ function install_relative() {
 	depends_check libqt5widgets5
 	depends_check libqt5network5
 	depends_check libusb-1.0-0
+	depends_check libpython3.4
 	waitbox "Dependancies" "Installing:${depends[@]}\n"
 	depends_install
 }
@@ -179,7 +180,7 @@ function build_from_source() {
 	mv *test* tests
 
 	# remove the build dependancies, particularly the kodi breaking qt5-default...
-	waitbox "Dependancies" "Uninstalling:\nqt5-default libusb-1.0-0-dev"
+	waitbox "Dependancies" "Uninstalling:\nqt5-default libusb-1.0-0-dev libpython3.4-dev"
 	sudo apt-get remove -y qt5-default libusb-1.0-0-dev libpython3.4-dev
 	sudo apt-get autoremove -y
 
@@ -216,9 +217,10 @@ function uninstall() {
 	sudo systemctl daemon-reload
 
 	# remove the dependancies...
-	waitbox "Dependancies" "Uninstalling:\nlibqt5core5a libqt5gui5 libqt5widgets5 libqt5network5 libusb-1.0-0"
-	sudo apt-get remove -y libqt5core5a libqt5gui5 libqt5widgets5 libqt5network5 libusb-1.0-0
-	sudo apt-get autoremove -y
+	# waitbox "Dependancies" "Uninstalling:\nlibqt5core5a libqt5gui5 libqt5widgets5 libqt5network5 libusb-1.0-0 libpython3.4"
+	# sudo apt-get remove -y libqt5core5a libqt5gui5 libqt5widgets5 libqt5network5 libusb-1.0-0 libpython3.4
+	# sudo apt-get autoremove -y
+	# ACTUALLY NOT ANYMORE AS SOMEBODY ELSE MIGHT BE USING THEM - A BIT IRRESPONSIBLE
 }
 
 function post_installation() {
