@@ -1,5 +1,20 @@
 # hyperion-vero4k
-Automated build and default install of hyperion
-  
-# Work in Progress
-### This is working on my system, I'm just automating the installation now
+use Install Hyperion from binaries or custom build from source.
+GUI
+Easy
+
+# Usage
+
+```
+sudo apt-get install git
+git clone https://github.com/hissingshark/hyperion-vero4k.git
+cd hyperion-vero4k
+sudo ./install.sh
+```
+
+# Post install
+You can manually edit the config file or better use the GUI hypercon.jar
+https://sourceforge.net/projects/hyperion-project/
+
+Plenty of advice and a forum at:
+https://hyperion-project.org/wiki/Main
