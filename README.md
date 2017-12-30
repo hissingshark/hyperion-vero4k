@@ -1,7 +1,7 @@
 # hyperion-vero4k
-use Install Hyperion from binaries or custom build from source.
-GUI
-Easy
+* Install Hyperion from binaries or custom build from source.
+* GUI
+* Easy
 
 # Usage
 
