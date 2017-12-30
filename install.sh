@@ -51,6 +51,8 @@ function install_relative() {
 
 	# copy over bins
 	go build/bin
+	sudo mkdir -p /usr/share/hyperion
+	cp -r tests /usr/share/hyperion
 	sudo cp * /usr/bin
 
 	# (re)make config folder and copy over
@@ -99,12 +101,18 @@ function build_from_source() {
 	# check and get dependancies
 	depends_check git
 	depends_check cmake
-	depends_check build essential
+	depends_check build-essential
+	depends_check qt5-default
+	depends_check libusb-1.0-0-dev
+	depends_check libpython3.4-dev
 	waitbox "Dependancy Installation" ${depends[@]}
 	depends_install
 
-	# clone the srouce repo
+	# clone the source repo
 	waitbox "Git Clone" "Downloading the Hyperion project repository"
+	if [ -d ./source ]; then
+		rm -r source
+	fi
 	git clone --recursive https://github.com/hyperion-project/hyperion.git source
 
 	go source
@@ -117,7 +125,9 @@ function build_from_source() {
 	go build
 
 	# compile list of cmake bool options for building and the checklist dialog
-	cmake .. &>/dev/null
+	sudo cmake .. &>/dev/null
+	flags=()
+	options=()
 
 	while IFS= read line; do
 		tmp=($(echo $line | cut -d ':' -f 1))
@@ -132,7 +142,7 @@ function build_from_source() {
 	ret_val=$?
 	exec 3>&-
 
-	if [ "$ret_val" -eq DIALOG_OK ]; then
+	if [ $ret_val -eq $DIALOG_OK ]; then
 		# parse checklist results and prepare cmake build options
 		buildcmd=(cmake)
 		count=0
@@ -157,19 +167,19 @@ function build_from_source() {
 		return
 	fi
 
-	# get build dependancies
-	depends_check build-essential qt5-default
-	waitbox "Dependancy Installation" ${depends[@]}
-	depends_install
-
 	# compile hyperion
 	waitbox "Compiling" "This will take quite a while, so I'll show you the output to keep you posted..."; sleep 2;
 	${buildcmd[@]}
 	make -j4
 
-	# remove the kodi breaking qt5-default...
-	waitbox "Dependancies" "Uninstalling:\nqt5-default"
-	sudo apt-get remove -y qt5-default
+	# organise the test programs if there are any
+	go bin
+	mkdir tests
+	mv *test* tests
+
+	# remove the build dependancies, particularly the kodi breaking qt5-default...
+	waitbox "Dependancies" "Uninstalling:\nqt5-default libusb-1.0-0-dev"
+	sudo apt-get remove -y qt5-default libusb-1.0-0-dev libpython3.4-dev
 	sudo apt-get autoremove -y
 
 	# install everything
@@ -180,10 +190,13 @@ function build_from_source() {
 }
 
 function uninstall() {
+	# chance to back out
 	if (! dialog --backtitle "Hyperion Setup on Vero4K - Uninstall" --title "PROCEED?" --defaultno --no-label "Abort" --yesno "This will delete all installed binaries, effects and configs." 0 0); then
 		return
 	fi
 
+	# delete bins
+	sudo rm /usr/bin/gpio2spi
 	sudo rm /usr/bin/hyperion-aml
 	sudo rm /usr/bin/hyperiond
 	sudo rm /usr/bin/hyperion-framebuffer
@@ -191,10 +204,13 @@ function uninstall() {
 	sudo rm /usr/bin/hyperion-v4l2
 	sudo rm /usr/bin/protoc
 
+	# delete configs
 	sudo rm -r /etc/hyperion
 
+	# delete effects and test programs
 	sudo rm -r /usr/share/hyperion
 
+	# delete and unregister service
 	sudo rm /etc/systemd/system/hyperion.service
 	sudo systemctl daemon-reload
 
@@ -209,14 +225,14 @@ function post_installation() {
     --no-collapse \
     --msgbox \
 "
-Please refer to the hyperion wiki for configuration advice.\n \
+Please refer to the Hyperion wiki for configuration advice.\n \
 https://hyperion-project.org/wiki/Main\n\n \
-The configuration file is in /etc/hyperion\n \
-Although it can be edited manually the java based gui is recommended:\n \
-hypercon.jar\n\n \
-It should be possible to start/stop hyperion daemon server with:\n \
+The configuration file is in /etc/hyperion/\n \
+Although it can be edited manually the Java based GUI is recommended:\n \
+hypercon.jar (try SourceForge)\n\n \
+It should be possible to start/stop the Hyperion daemon server with:\n \
 sudo systemctl <start/stop> hyperion.service\n\n \
-Also look out for the hyperion remote control app in the Google Play Store.
+Also look out for the Hyperion remote control app in the Google Play Store.
 " 0 0
 }
 
@@ -228,6 +244,12 @@ Also look out for the hyperion remote control app in the Google Play Store.
 # check for dialog and cmake
 depends_check dialog
 depends_check cmake
+
+if [ ${#depends[@]} -gt 0 ]; then
+	clear
+	echo -e "\n\n*****\nFor first time use I need to install:\n\n${depends[@]}\n\nPlease wait...\n**********\n\n"
+	sleep 3
+fi
 
 # install missing dependancies
 depends_install
@@ -268,13 +290,25 @@ while true; do
       echo "Program terminated."
       ;;
     1 )
-			if (! dialog --backtitle "Hyperion Setup on Vero4K - Install from binary" --title "PROCEED?" --defaultno --no-label "Abort" --yesno "This will delete any previous build files, folders and configs you may have." 0 0); then
-				return
+			dialog --backtitle "Hyperion Setup on Vero4K - Install from binary" --title "Advice" --msgbox \
+"This will install a prebuilt version of Hyperion with all of the Vero4K compatible compilation options enabled.\n\n\
+Of course this will use a little more file space and possibly more CPU resources, for features you may not need.\n\n\
+It will also be an older version, so consider building from source once you've tried things out." 0 0
+
+			if (dialog --backtitle "Hyperion Setup on Vero4K - Install from binary" --title "PROCEED?" --defaultno --no-label "Abort" --yesno "This will delete any previous build files, folders and configs you may have." 0 0); then
+				cd $REPO_DIR
+				install_relative
 			fi
-			cd $REPO_DIR
-			install_relative
       ;;
     2 )
+			dialog --backtitle "Hyperion Setup on Vero4K - Build from source" --title "Advice" --msgbox \
+"This software is intended for the Vero4K running OSMC, therefore options relating to:\n\
+\n\
+1. The Raspberry Pi,\n\
+2. An X environment,\n\
+3. An Apple/OSX setup\n\n\
+are unsupported - likely failing to build.\n\n\
+Feel free to use this script as a starting point for your own installer on another platform.  This is open-source afterall." 0 0
 			build_from_source
       ;;
     3 )
