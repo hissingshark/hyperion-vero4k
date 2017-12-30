@@ -172,8 +172,9 @@ function build_from_source() {
 	${buildcmd[@]}
 	make -j4
 
-	# organise the test programs if there are any
+	# organise the test programs if there are any and make everything executable
 	go bin
+	chmod +x *
 	mkdir tests
 	mv *test* tests
 
@@ -308,6 +309,7 @@ It will also be an older version, so consider building from source once you've t
 2. An X environment,\n\
 3. An Apple/OSX setup\n\n\
 are unsupported - likely failing to build.\n\n\
+*** You are recommended at this time to ENABLE QT5 ***\n\n
 Feel free to use this script as a starting point for your own installer on another platform.  This is open-source afterall." 0 0
 			build_from_source
       ;;
