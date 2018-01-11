@@ -56,9 +56,11 @@ function install_relative() {
 	sudo cp * /usr/bin
 
 	# (re)make config folder and copy over
+	# now with backup of the previous config to avoid disappointment
 	cd ../..
 	go config
 	if [ -d /etc/hyperion ]; then
+		cp /etc/hyperion/* .
 		sudo rm -r /etc/hyperion
 	fi
 	sudo mkdir /etc/hyperion
@@ -87,7 +89,7 @@ function install_relative() {
 	depends_check libqt5widgets5
 	depends_check libqt5network5
 	depends_check libusb-1.0-0
-	depends_check libpython3.4
+	depends_check libpython3.5
 	waitbox "Dependancies" "Installing:${depends[@]}\n"
 	depends_install
 }
@@ -95,7 +97,7 @@ function install_relative() {
 function build_from_source() {
 	cd $REPO_DIR
 
-	if (! dialog --backtitle "Hyperion Setup on Vero4K - Build from source" --title "PROCEED?" --defaultno --no-label "Abort" --yesno "This will delete previous build files, folders and configs." 0 0); then
+	if (! dialog --backtitle "Hyperion Setup on Vero4K - Build from source" --title "PROCEED?" --defaultno --no-label "Abort" --yesno "This will delete previous build files and folders. It will attempt to preserve old configs." 0 0); then
 		return
 	fi
 
@@ -105,7 +107,7 @@ function build_from_source() {
 	depends_check build-essential
 	depends_check qt5-default
 	depends_check libusb-1.0-0-dev
-	depends_check libpython3.4-dev
+	depends_check libpython3.5-dev
 	waitbox "Dependancy Installation" ${depends[@]}
 	depends_install
 
@@ -298,7 +300,7 @@ while true; do
 Of course this will use a little more file space and possibly more CPU resources, for features you may not need.\n\n\
 It will also be an older version, so consider building from source once you've tried things out." 0 0
 
-			if (dialog --backtitle "Hyperion Setup on Vero4K - Install from binary" --title "PROCEED?" --defaultno --no-label "Abort" --yesno "This will delete any previous build files, folders and configs you may have." 0 0); then
+			if (dialog --backtitle "Hyperion Setup on Vero4K - Install from binary" --title "PROCEED?" --defaultno --no-label "Abort" --yesno "This will delete any previous build files and folders you may have.  It will attempt to preserve old configs." 0 0); then
 				cd $REPO_DIR
 				install_relative
 			fi
