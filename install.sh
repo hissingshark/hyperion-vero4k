@@ -85,7 +85,7 @@ function install_relative() {
 
 	# install runtime dependancies
 	depends_check libqt5core5a
-	depends_check	libqt5gui5
+	depends_check libqt5gui5
 	depends_check libqt5widgets5
 	depends_check libqt5network5
 	depends_check libusb-1.0-0
@@ -182,8 +182,8 @@ function build_from_source() {
 	mv *test* tests
 
 	# remove the build dependancies, particularly the kodi breaking qt5-default...
-	waitbox "Dependancies" "Uninstalling:\nqt5-default libusb-1.0-0-dev libpython3.4-dev"
-	sudo apt-get remove -y qt5-default libusb-1.0-0-dev libpython3.4-dev
+	waitbox "Dependancies" "Uninstalling:\nqt5-default libusb-1.0-0-dev libpython3.5-dev"
+	sudo apt-get remove -y qt5-default libusb-1.0-0-dev libpython3.5-dev
 	sudo apt-get autoremove -y
 
 	# install everything
