@@ -1,3 +1,5 @@
+# WORK IN PROGRESS!!  DO NOT CLONE!!
+
 # hyperion-vero4k
 * Install Hyperion from binaries or custom build from source.
 * GUI
