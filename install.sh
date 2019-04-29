@@ -295,20 +295,12 @@ function options_menu() {
                     It will also be an older version, so consider building from source once you've tried things out." 0 0
 
                 if (dialog --backtitle "Hyperion$TAG Setup on Vero4K - Install from binary" --title "PROCEED?" --defaultno --no-label "Abort" --yesno "This will delete any previous build files and folders you may have.\n\nIt will attempt to preserve old configs..." 0 0); then
-                    cd binaries_$EDITION
+                    cd prebuilt_$EDITION
                     install_relative
                 fi
                 ;;
             2 )
-                dialog --backtitle "Hyperion$TAG Setup on Vero4K - Build from source" --title "Advice" --msgbox \
-                    "This software is intended for the Vero4K running OSMC, therefore options relating to:\n\
-                    \n\
-                    1. The Raspberry Pi,\n\
-                    2. An X environment,\n\
-                    3. An Apple/OSX setup\n\n\
-                    are unsupported - likely failing to build.\n\n\
-                    *** You are recommended at this time to ENABLE QT5 ***\n\n
-                    Feel free to use this script as a starting point for your own installer on another platform.  This is open-source afterall." 0 0
+                dialog --backtitle "Hyperion$TAG Setup on Vero4K - Build from source" --title "Advice" --msgbox "$build_advice" 0 0
                 build_from_source
                 ;;
             3 )
@@ -382,14 +374,17 @@ while true; do
             fatal_depends=(qt5-default)
             systemd_unit='hyperion.systemd'
             repo_url='https://github.com/hyperion-project/hyperion.git'
-            build_advice='This software is intended for the Vero4K running OSMC, therefore options relating to:\n\
-                \n\
-                1. The Raspberry Pi,\n\
-                2. An X environment,\n\
-                3. An Apple/OSX setup\n\n\
-                are unsupported - likely failing to build.\n\n\
-                *** You are recommended at this time to ENABLE QT5 ***\n\n
-                Feel free to use this script as a starting point for your own installer on another platform.  This is open-source afterall.'
+            build_advice='This software is intended for the Vero4K running OSMC, therefore options relating to:\n
+\n
+  1. The Raspberry Pi,\n
+  2. An X environment,\n
+  3. An Apple/OSX setup\n
+\n
+are unsupported - likely failing to build.\n
+\n
+*** You are recommended at this time to ENABLE QT5 ***\n
+\n
+Feel free to use this script as a starting point for your own installer on another platform.  This is open-source afterall.'
             post_advice=''
             options_menu
             ;;
@@ -403,13 +398,15 @@ while true; do
             systemd_unit='hyperion.systemd'
             repo_url='https://github.com/hyperion-project/hyperion.ng.git'
             build_advice='This software is intended for the Vero4K running OSMC, therefore options relating to:\n\
-                \n\
-                1. The Raspberry Pi,\n\
-                2. An X environment,\n\
-                3. An Apple/OSX setup\n\n\
-                are unsupported - likely failing to build.\n\n\
-                *** You are recommended at this time to ENABLE QT5 ***\n\n
-                Feel free to use this script as a starting point for your own installer on another platform.  This is open-source afterall.'
+    \n \
+    1. The Raspberry Pi,\n \
+    2. An X environment,\n \
+    3. An Apple/OSX setup\n\n \
+are unsupported - likely failing to build.\n \
+\n \
+*** You are recommended at this time to ENABLE QT5 ***\n \
+\n \
+Feel free to use this script as a starting point for your own installer on another platform.  This is open-source afterall.'
             post_advice=''
             options_menu
         ;;
