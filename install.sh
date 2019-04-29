@@ -19,8 +19,8 @@ DIALOG_ESC=255
 #############
 
 # REPO_DIR=$(pwd)
-EDITION=()
-TAG=()
+edition=()
+tag=()
 build_advice=()
 post_advice=()
 
@@ -118,7 +118,7 @@ function install_relative() {
 }
 
 function build_from_source() {
-    if (! dialog --backtitle "Hyperion$TAG Setup on Vero4K - Build from source" --title "PROCEED?" --defaultno --no-label "Abort" --yesno "This will delete previous build files and folders.\n\nIt will attempt to preserve old configs..." 0 0); then
+    if (! dialog --backtitle "Hyperion$tag Setup on Vero4K - Build from source" --title "PROCEED?" --defaultno --no-label "Abort" --yesno "This will delete previous build files and folders.\n\nIt will attempt to preserve old configs..." 0 0); then
         return
     fi
 
@@ -134,13 +134,13 @@ function build_from_source() {
     depends_install
 
     # clone the source repo
-    waitbox "Git Clone" "Downloading the Hyperion$TAG project repository"
-    if [ -d ./source_$EDITION ]; then
-        rm -r source_$EDITION
+    waitbox "Git Clone" "Downloading the Hyperion$tag project repository"
+    if [ -d ./source_$edition ]; then
+        rm -r source_$edition
     fi
-    git clone --recursive $repo_url source_$EDITION
+    git clone --recursive $repo_url source_$edition
 
-    go source_$EDITION
+    go source_$edition
 
     # remove build dir if it exists and start anew
     if [ -d ./build ]; then
@@ -161,7 +161,7 @@ function build_from_source() {
     done <<< "$(cmake -L 2>/dev/null | grep BOOL)"
 
     # run checklist dialog
-    cmd=(dialog --clear --backtitle "Hyperion$TAG Setup on Vero4K - Build from source" --title "BUILD OPTIONS" --checklist "Press SPACE to toggle options:" 15 40 7)
+    cmd=(dialog --clear --backtitle "Hyperion$tag Setup on Vero4K - Build from source" --title "BUILD OPTIONS" --checklist "Press SPACE to toggle options:" 15 40 7)
     exec 3>&1
     result=$("${cmd[@]}" "${options[@]}" 2>&1 1>&3)
     ret_val=$?
@@ -193,7 +193,7 @@ function build_from_source() {
     fi
 
     # compile hyperion
-    waitbox "Compiling Hyperion$TAG" "This will take quite a while, so I'll show you the output to keep you posted..."; sleep 2;
+    waitbox "Compiling Hyperion$tag" "This will take quite a while, so I'll show you the output to keep you posted..."; sleep 2;
     ${buildcmd[@]}
     make -j4
 
@@ -221,7 +221,7 @@ function build_from_source() {
 
 function uninstall() {
     # chance to back out
-    if (! dialog --backtitle "Hyperion$TAG Setup on Vero4K - Uninstall" --title "PROCEED?" --defaultno --no-label "Abort" --yesno "This will delete all installed binaries, effects and configs." 0 0); then
+    if (! dialog --backtitle "Hyperion$tag Setup on Vero4K - Uninstall" --title "PROCEED?" --defaultno --no-label "Abort" --yesno "This will delete all installed binaries, effects and configs." 0 0); then
         return
     fi
 
@@ -246,20 +246,20 @@ function uninstall() {
 }
 
 function post_installation() {
-  dialog --title "Hyperion$TAG: Post Installation Advice" \
+  dialog --title "Hyperion$tag: Post Installation Advice" \
     --no-collapse \
     --msgbox \
     "$post_advice" 0 0
 }
 
 function options_menu() {
-    cd hyperion_$EDITION
+    cd hyperion_$edition
 
     while true; do
         exec 3>&1
         selection=$(dialog \
-            --backtitle "Hyperion$TAG Setup on Vero4K" \
-            --title "Hyperion$TAG" \
+            --backtitle "Hyperion$tag Setup on Vero4K" \
+            --title "Hyperion$tag" \
             --clear \
             --cancel-label "Back" \
             --item-help \
@@ -289,18 +289,18 @@ function options_menu() {
                 echo "Program terminated @004." #004
                 ;;
             1 )
-                dialog --backtitle "Hyperion$TAG Setup on Vero4K - Install from binary" --title "Advice" --msgbox \
-                    "This will install a prebuilt version of Hyperion$TAG with all of the Vero4K compatible compilation options enabled.\n\n\
+                dialog --backtitle "Hyperion$tag Setup on Vero4K - Install from binary" --title "Advice" --msgbox \
+                    "This will install a prebuilt version of Hyperion$tag with all of the Vero4K compatible compilation options enabled.\n\n\
                     Of course this will use a little more file space and possibly more CPU resources, for features you may not need.\n\n\
                     It will also be an older version, so consider building from source once you've tried things out." 0 0
 
-                if (dialog --backtitle "Hyperion$TAG Setup on Vero4K - Install from binary" --title "PROCEED?" --defaultno --no-label "Abort" --yesno "This will delete any previous build files and folders you may have.\n\nIt will attempt to preserve old configs..." 0 0); then
-                    cd prebuilt_$EDITION
+                if (dialog --backtitle "Hyperion$tag Setup on Vero4K - Install from binary" --title "PROCEED?" --defaultno --no-label "Abort" --yesno "This will delete any previous build files and folders you may have.\n\nIt will attempt to preserve old configs..." 0 0); then
+                    cd prebuilt_$edition
                     install_relative
                 fi
                 ;;
             2 )
-                dialog --backtitle "Hyperion$TAG Setup on Vero4K - Build from source" --title "Advice" --msgbox "$build_advice" 0 0
+                dialog --backtitle "Hyperion$tag Setup on Vero4K - Build from source" --title "Advice" --msgbox "$build_advice" 0 0
                 build_from_source
                 ;;
             3 )
@@ -367,8 +367,8 @@ while true; do
             ;;
         1 )
             # configure installer for hyperion "classic"
-            EDITION='classic'
-            TAG=' "classic"'
+            edition='classic'
+            tag=' "classic"'
             build_depends=(git cmake build-essential qt5-default libusb-1.0-0-dev libpython3.5-dev)
             run_depends=(libqt5core5a libqt5gui5 libqt5widgets5 libqt5network5 libusb-1.0-0 libpython3.5)
             fatal_depends=(qt5-default)
@@ -390,8 +390,8 @@ Feel free to use this script as a starting point for your own installer on anoth
             ;;
         2 )
             # configure installer for hyperion.ng
-            EDITION='nextgen'
-            TAG='.ng'
+            edition='nextgen'
+            tag='.ng'
             build_depends=(vero3-userland-dev-osmc git cmake build-essential vero3 qt5-default libusb-1.0-0-dev libpython3.5-dev)
             run_depends=(vero3-userland-osmc libqt5concurrent5 libqt5core5a libqt5dbus5 libqt5gui5 libqt5network5 libqt5printsupport5 libqt5serialport5 libqt5sql5 libqt5test5 libqt5widgets5 libqt5xml5 qt5-qmake)
             fatal_depends=(libegl1-mesa)
