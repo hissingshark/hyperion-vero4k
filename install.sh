@@ -212,8 +212,8 @@ function build_from_source() {
     mv *test* tests
 
     # Let's save SD card wear and only remove the system breakers. Will make rebuilds quicker too.
-    waitbox "Dependancies" "Uninstalling:\nqt5-default"
-    sudo apt-get remove -y qt5-default
+    waitbox "Dependancies" "Uninstalling:\n${fatal_depends[@]}"
+    sudo apt-get remove -y ${fatal_depends[@]}
     sudo apt-get autoremove -y
 
     # install everything
