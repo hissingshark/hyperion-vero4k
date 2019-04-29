@@ -230,12 +230,14 @@ function uninstall() {
     fi
 
     # delete bins
+    sudo rm /usr/bin/flatc
+    sudo rm /usr/bin/flathash
     sudo rm /usr/bin/gpio2spi
     sudo rm /usr/bin/hyperion-aml
-    sudo rm /usr/bin/hyperiond
     sudo rm /usr/bin/hyperion-framebuffer
     sudo rm /usr/bin/hyperion-remote
     sudo rm /usr/bin/hyperion-v4l2
+    sudo rm /usr/bin/hyperiond
     sudo rm /usr/bin/protoc
 
     # delete effects and test programs
