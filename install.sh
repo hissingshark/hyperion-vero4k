@@ -79,8 +79,7 @@ function install_relative() {
     cp -r tests /usr/share/hyperion
     sudo cp * /usr/bin
 
-    # copy over configs
-    # with backup of the previous config to avoid disappointment
+    # copy over configs with backup of the previous config to avoid disappointment
     # bit dirty - uses the fact that cp and rm ignore folders without the --recursive option...
     go ../../config
     if [ -d /etc/hyperion ]; then
@@ -212,11 +211,7 @@ function build_from_source() {
     mkdir tests
     mv *test* tests
 
-    # remove the build dependancies, particularly the kodi breaking qt5-default...
-    #waitbox "Dependancies" "Uninstalling:\nqt5-default libusb-1.0-0-dev libpython3.5-dev"
-    #sudo apt-get remove -y qt5-default libusb-1.0-0-dev libpython3.5-dev
-
-    # Let's save SD card wear and only remove the breakers. Will make rebuilds quicker too.
+    # Let's save SD card wear and only remove the system breakers. Will make rebuilds quicker too.
     waitbox "Dependancies" "Uninstalling:\nqt5-default"
     sudo apt-get remove -y qt5-default
     sudo apt-get autoremove -y
