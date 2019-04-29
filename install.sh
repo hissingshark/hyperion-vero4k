@@ -221,7 +221,7 @@ function build_from_source() {
 
 function uninstall() {
     # chance to back out
-    if (! dialog --backtitle "Hyperion$tag Setup on Vero4K - Uninstall" --title "PROCEED?" --defaultno --no-label "Abort" --yesno "This will delete all installed binaries, effects and configs." 0 0); then
+    if (! dialog --backtitle "Hyperion$tag Setup on Vero4K - Uninstall" --title "PROCEED?" --defaultno --no-label "Abort" --yesno "This will delete all installed binaries and effects." 0 0); then
         return
     fi
 
@@ -234,15 +234,18 @@ function uninstall() {
     sudo rm /usr/bin/hyperion-v4l2
     sudo rm /usr/bin/protoc
 
-    # delete configs
-    sudo rm -r /etc/hyperion
-
     # delete effects and test programs
     sudo rm -r /usr/share/hyperion
 
     # delete and unregister service
     sudo rm /etc/systemd/system/hyperion.service
     sudo systemctl daemon-reload
+
+    # retain configs?
+    if (dialog --backtitle "Hyperion$tag Setup on Vero4K - Uninstall" --title "CONFIGURATION FILES!" --defaultno --yes-label "Delete" --no-label "Keep" --yesno "Would you like to DELETE the config files as well?" 0 0); then
+        # delete configs
+        sudo rm -r /etc/hyperion
+    fi
 }
 
 function post_installation() {
