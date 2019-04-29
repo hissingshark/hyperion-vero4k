@@ -79,15 +79,23 @@ function install_relative() {
     cp -r tests /usr/share/hyperion
     sudo cp * /usr/bin
 
-    # (re)make config folder and copy over
-    # now with backup of the previous config to avoid disappointment
-
+    # copy over configs
+    # with backup of the previous config to avoid disappointment
+    # bit dirty - uses the fact that cp and rm ignore folders without the --recursive option...
     go ../../config
     if [ -d /etc/hyperion ]; then
-        cp /etc/hyperion/* .
-        sudo rm -r /etc/hyperion
+        stamp=$(date +'%Y-%m-%d_%H%M%S')
+        # create a time stamped backup folder
+        sudo mkdir /etc/hyperion/backup_$stamp
+        # then copy over anything that is not a folder
+        cp /etc/hyperion/* /etc/hyperion/backup_$stamp
+        # then remove anything that is not a folder
+        rm /etc/hyperion/*
+        # tell somebody what we've done
+        dialog --backtitle "Hyperion$tag Setup on Vero4K - Installation" --title "Advice" --msgbox "The previous configuration files have been moved to /etc/hyperion/backup_$stamp" 0 0
+    else
+        sudo mkdir /etc/hyperion
     fi
-    sudo mkdir /etc/hyperion
     sudo cp * /etc/hyperion
 
     # (re)make effects folders and copy over
@@ -103,6 +111,7 @@ function install_relative() {
     sudo cp $systemd_unit /etc/systemd/system/hyperion.service
     sudo systemctl daemon-reload
 
+    # return to base
     cd ../../..
 
     # install runtime dependancies
