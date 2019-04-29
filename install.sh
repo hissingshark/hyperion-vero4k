@@ -18,7 +18,7 @@ DIALOG_ESC=255
 # VARIABLES #
 #############
 
-# REPO_DIR=$(pwd)
+REPO_DIR=$(pwd)
 edition=()
 tag=()
 build_advice=()
@@ -260,8 +260,6 @@ function post_installation() {
 }
 
 function options_menu() {
-    cd hyperion_$edition
-
     while true; do
         exec 3>&1
         selection=$(dialog \
@@ -302,12 +300,13 @@ function options_menu() {
                     It will also be an older version, so consider building from source once you've tried things out." 0 0
 
                 if (dialog --backtitle "Hyperion$tag Setup on Vero4K - Install from binary" --title "PROCEED?" --defaultno --no-label "Abort" --yesno "This will delete any previous build files and folders you may have.\n\nIt will attempt to preserve old configs..." 0 0); then
-                    cd prebuilt_$edition
+                    cd $REPO_DIR/hyperion_$edition/prebuilt_$edition
                     install_relative
                 fi
                 ;;
             2 )
                 dialog --backtitle "Hyperion$tag Setup on Vero4K - Build from source" --title "Advice" --msgbox "$build_advice" 0 0
+                cd $REPO_DIR/hyperion_$edition
                 build_from_source
                 ;;
             3 )
