@@ -37,7 +37,7 @@ declare -a buildcmd
 ####################
 
 function depends_check() {
-    for package in ${$1[@]}; do
+    for package in "$@"; do
         if [ "$(apt list --installed $package 2>/dev/null | grep $1)" = "" ]; then
             missing_depends+=($package)
         fi
@@ -114,15 +114,17 @@ function install_relative() {
     cd ../../..
 
     # install runtime dependancies
-    depends_check run_depends
+    depends_check "${run_depends[@]}"
 
     msg_list=()
-    for package in ${$missing_depends[@]}; do
+    for package in "${missing_depends[@]}"; do
         msg_list+=("$package\n")
     done
-    waitbox "Dependancies" "Installing:\n$msg_list\n"
+    waitbox "Runtime Dependancies" "Installing:\n$msg_list\n"
 
     depends_install
+
+    waitbox "Installation" "Process Completed!\n"
 }
 
 function build_from_source() {
@@ -131,13 +133,13 @@ function build_from_source() {
     fi
 
     # check and get dependancies
-    depends_check build_depends
+    depends_check ${build_depends[@]}
 
     msg_list=()
     for package in ${$missing_depends[@]}; do
         msg_list+=("$package\n")
     done
-    waitbox "Dependancies" "Installing:\n$msg_list\n"
+    waitbox "Build Dependancies" "Installing:\n$msg_list\n"
 
     depends_install
 
@@ -297,9 +299,11 @@ function options_menu() {
                 ;;
             1 )
                 dialog --backtitle "Hyperion$tag Setup on Vero4K - Install from binary" --title "Advice" --msgbox \
-                    "This will install a prebuilt version of Hyperion$tag with all of the Vero4K compatible compilation options enabled.\n\n\
-                    Of course this will use a little more file space and possibly more CPU resources, for features you may not need.\n\n\
-                    It will also be an older version, so consider building from source once you've tried things out." 0 0
+"This will install a prebuilt version of Hyperion$tag with all of the Vero4K compatible compilation options enabled.\n
+\n
+Of course this will use a little more file space and possibly more CPU resources, for features you may not need.\n
+\n\
+It will also be an older version, so consider building from source once you've tried things out." 0 0
 
                 if (dialog --backtitle "Hyperion$tag Setup on Vero4K - Install from binary" --title "PROCEED?" --defaultno --no-label "Abort" --yesno "This will delete any previous build files and folders you may have.\n\nIt will attempt to preserve old configs..." 0 0); then
                     cd $REPO_DIR/hyperion_$edition/prebuilt_$edition
@@ -380,9 +384,10 @@ while true; do
             build_depends=(git cmake build-essential qt5-default libusb-1.0-0-dev libpython3.5-dev)
             run_depends=(libqt5core5a libqt5gui5 libqt5widgets5 libqt5network5 libusb-1.0-0 libpython3.5)
             fatal_depends=(qt5-default)
-            systemd_unit='hyperion.systemd'
+            systemd_unit='hyperion.systemd.sh'
             repo_url='https://github.com/hyperion-project/hyperion.git'
-            build_advice='This software is intended for the Vero4K running OSMC, therefore options relating to:\n
+            build_advice= \
+'This software is intended for the Vero4K running OSMC, therefore options relating to:\n
 \n
   1. The Raspberry Pi,\n
   2. An X environment,\n
