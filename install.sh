@@ -23,6 +23,7 @@ edition=()
 tag=()
 build_advice=()
 post_advice=()
+msg_list=()
 
 declare -a build_depends
 declare -a run_depends
@@ -37,8 +38,9 @@ declare -a buildcmd
 ####################
 
 function depends_check() {
-    for package in "$@"; do
-        if [ "$(apt list --installed $package 2>/dev/null | grep $1)" = "" ]; then
+    missing_depends=()
+    for package in $@; do
+        if [ "$(apt list --installed $package 2>/dev/null | grep $package)" = "" ]; then
             missing_depends+=($package)
         fi
     done
@@ -74,6 +76,7 @@ function install_relative() {
     # all operations wil be relative to the current working directory, so must be set correctly before calling
 
     # copy over bins
+    waitbox "PROGRESS" "Installing binaries"
     go build/bin
     sudo mkdir -p /usr/share/hyperion
     cp -r tests /usr/share/hyperion
@@ -81,6 +84,7 @@ function install_relative() {
 
     # copy over configs with backup of the previous config to avoid disappointment
     # bit dirty - uses the fact that cp and rm ignore folders without the --recursive option...
+    waitbox "PROGRESS" "Installing configuration files"
     go ../../config
     if [ -d /etc/hyperion ]; then
         stamp=$(date +'%Y-%m-%d_%H%M%S')
@@ -91,13 +95,16 @@ function install_relative() {
         # then remove anything that is not a folder
         rm /etc/hyperion/*
         # tell somebody what we've done
-        dialog --backtitle "Hyperion$tag Setup on Vero4K - Installation" --title "Advice" --msgbox "The previous configuration files have been moved to /etc/hyperion/backup_$stamp" 0 0
+#        dialog --backtitle "Hyperion$tag Setup on Vero4K - Installation" --title "Advice" --msgbox "The previous configuration files have been moved to /etc/hyperion/backup_$stamp" 0 0
+        waitbox "PROGRESS" "The previous configuration files have been moved to /etc/hyperion/backup_$stamp"
+        wait 3
     else
         sudo mkdir /etc/hyperion
     fi
     sudo cp * /etc/hyperion
 
     # (re)make effects folders and copy over
+    waitbox "PROGRESS" "Installing effects"
     go ../effects
     if [ -d /usr/share/hyperion ]; then
         sudo rm -r /usr/share/hyperion
@@ -106,6 +113,7 @@ function install_relative() {
     sudo cp * /usr/share/hyperion/effects
 
     # copy over systemd script and register
+    waitbox "PROGRESS" "Registering hyperion service"
     go ../bin/service
     sudo cp $systemd_unit /etc/systemd/system/hyperion.service
     sudo systemctl daemon-reload
@@ -114,16 +122,14 @@ function install_relative() {
     cd ../../..
 
     # install runtime dependancies
-    depends_check "${run_depends[@]}"
-
-    msg_list=()
+    waitbox "PROGRESS" "Checking for missing runtime dependancies"
+    depends_check ${run_depends[@]}
+    msg_list='Installing:\n'
     for package in "${missing_depends[@]}"; do
-        msg_list+=("$package\n")
+        msg_list=("$msg_list  $package\n")
     done
-    waitbox "Runtime Dependancies" "Installing:\n$msg_list\n"
-
+    waitbox "Runtime Dependancies" "$msg_list\n"
     depends_install
-
     waitbox "Installation" "Process Completed!\n"
 }
 
@@ -133,6 +139,7 @@ function build_from_source() {
     fi
 
     # check and get dependancies
+    waitbox "PROGRESS" "Checking for missing build dependancies"
     depends_check ${build_depends[@]}
 
     msg_list=()
@@ -140,7 +147,6 @@ function build_from_source() {
         msg_list+=("$package\n")
     done
     waitbox "Build Dependancies" "Installing:\n$msg_list\n"
-
     depends_install
 
     # clone the source repo
@@ -149,7 +155,6 @@ function build_from_source() {
         rm -r source_$edition
     fi
     git clone --recursive $repo_url source_$edition
-
     go source_$edition
 
     # remove build dir if it exists and start anew
@@ -160,6 +165,7 @@ function build_from_source() {
     go build
 
     # compile list of cmake bool options for building and the checklist dialog
+    waitbox "PROGRESS" "Preparing build options checklist"
     sudo cmake .. &>/dev/null
     flags=()
     options=()
@@ -206,6 +212,7 @@ function build_from_source() {
     waitbox "Compiling Hyperion$tag" "This will take quite a while, so I'll show you the output to keep you posted..."; sleep 2;
     ${buildcmd[@]}
     make -j4
+    waitbox "PROGRESS" "Build complete!"
 
     # organise the test programs if there are any and make everything executable
     go bin
@@ -214,7 +221,7 @@ function build_from_source() {
     mv *test* tests
 
     # Let's save SD card wear and only remove the system breakers. Will make rebuilds quicker too.
-    waitbox "Dependancies" "Uninstalling:\n${fatal_depends[@]}"
+    waitbox "Harmful Dependancies" "Uninstalling:\n${fatal_depends[@]}"
     sudo apt-get remove -y ${fatal_depends[@]}
     sudo apt-get autoremove -y
 
@@ -330,9 +337,7 @@ It will also be an older version, so consider building from source once you've t
 ####################
 
 # check for dialog and cmake
-missing_depends=()
-depends_check dialog
-depends_check cmake
+depends_check dialog cmake
 
 if [ ${#missing_depends[@]} -gt 0 ]; then
     clear
