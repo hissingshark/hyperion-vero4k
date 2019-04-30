@@ -1,0 +1,3 @@
+# ignore the source build folders
+hyperion_classic/source_classic/
+hyperion_nextgen/source_nextgen/
