@@ -142,11 +142,11 @@ function build_from_source() {
     waitbox "PROGRESS" "Checking for missing build dependancies"
     depends_check ${build_depends[@]}
 
-    msg_list=()
-    for package in ${$missing_depends[@]}; do
-        msg_list+=("$package\n")
+    msg_list='Installing:\n'
+    for package in "${missing_depends[@]}"; do
+        msg_list=("$msg_list  $package\n")
     done
-    waitbox "Build Dependancies" "Installing:\n$msg_list\n"
+    waitbox "Build Dependancies" "$msg_list\n"
     depends_install
 
     # clone the source repo
@@ -185,7 +185,7 @@ function build_from_source() {
 
     if [ $ret_val -eq $DIALOG_OK ]; then
         # parse checklist results and prepare cmake build options
-        buildcmd=(cmake)
+        buildcmd=(cmake -DPLATFORM=amlogic )
         count=0
         for item in ${flags[@]}; do
             state=OFF
@@ -410,7 +410,7 @@ Feel free to use this script as a starting point for your own installer on anoth
             # configure installer for hyperion.ng
             edition='nextgen'
             tag='.ng'
-            build_depends=(vero3-userland-dev-osmc git cmake build-essential vero3 qt5-default libusb-1.0-0-dev libpython3.5-dev)
+            build_depends=(vero3-userland-dev-osmc git cmake build-essential qtbase5-dev libqt5serialport5-dev libusb-1.0-0-dev libpython3.5-dev)
             run_depends=(vero3-userland-osmc libqt5concurrent5 libqt5core5a libqt5dbus5 libqt5gui5 libqt5network5 libqt5printsupport5 libqt5serialport5 libqt5sql5 libqt5test5 libqt5widgets5 libqt5xml5 qt5-qmake)
             fatal_depends=(libegl1-mesa)
             systemd_unit='hyperion.systemd'
