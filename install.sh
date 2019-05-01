@@ -138,16 +138,10 @@ function build_from_source() {
         return
     fi
 
-    # check and get dependancies
-    waitbox "PROGRESS" "Checking for missing build dependancies"
-    depends_check ${build_depends[@]}
-
-    msg_list='Installing:\n'
-    for package in "${missing_depends[@]}"; do
-        msg_list=("$msg_list  $package\n")
-    done
-    waitbox "Build Dependancies" "$msg_list\n"
-    depends_install
+    # configure build environment - particularly it avoids floating point runtime error
+    export CFLAGS="-I/opt/vero3/include -L/opt/vero3/lib -O3 -march=armv8-a+crc -mtune=cortex-a53 -mfpu=neon-fp-armv8 -mfloat-abi=hard -ftree-vectorize -funsafe-math-optimizations"
+    export CPPFLAGS=$CFLAGS
+    export CXXFLAGS=$CFLAGS
 
     # clone the source repo
     waitbox "Git Clone" "Downloading the Hyperion$tag project repository"
@@ -166,6 +160,7 @@ function build_from_source() {
 
     # compile list of cmake bool options for building and the checklist dialog
     waitbox "PROGRESS" "Preparing build options checklist"
+#    sudo cmake -DPLATFORM=amlogic .. &>/dev/null
     sudo cmake .. &>/dev/null
     flags=()
     options=()
@@ -174,7 +169,7 @@ function build_from_source() {
         tmp=($(echo $line | cut -d ':' -f 1))
         flags+=("$tmp")
         options+=("${#flags[@]}" "$tmp" "off")
-    done <<< "$(cmake -L 2>/dev/null | grep BOOL)"
+    done <<< "$(sudo cmake -L 2>/dev/null | grep BOOL)"
 
     # run checklist dialog
     cmd=(dialog --clear --backtitle "Hyperion$tag Setup on Vero4K - Build from source" --title "BUILD OPTIONS" --checklist "Press SPACE to toggle options:" 15 40 7)
@@ -208,8 +203,20 @@ function build_from_source() {
         return
     fi
 
+    # check and get dependancies
+    waitbox "PROGRESS" "Checking for missing build dependancies"
+    depends_check ${build_depends[@]}
+
+    msg_list='Installing:\n'
+    for package in "${missing_depends[@]}"; do
+        msg_list=("$msg_list  $package\n")
+    done
+    waitbox "Build Dependancies" "$msg_list\n"
+    depends_install
+
     # compile hyperion
     waitbox "Compiling Hyperion$tag" "This will take quite a while, so I'll show you the output to keep you posted..."; sleep 2;
+    sudo rm -rf *
     ${buildcmd[@]}
     make -j4
     waitbox "PROGRESS" "Build complete!"
@@ -415,15 +422,17 @@ Feel free to use this script as a starting point for your own installer on anoth
             fatal_depends=(libegl1-mesa)
             systemd_unit='hyperion.systemd'
             repo_url='https://github.com/hyperion-project/hyperion.ng.git'
-            build_advice='This software is intended for the Vero4K running OSMC, therefore options relating to:\n\
-    \n \
-    1. The Raspberry Pi,\n \
-    2. An X environment,\n \
-    3. An Apple/OSX setup\n\n \
-are unsupported - likely failing to build.\n \
-\n \
-*** You are recommended at this time to ENABLE QT5 ***\n \
-\n \
+            build_advice= \
+'This software is intended for the Vero4K running OSMC, therefore options relating to:\n
+\n
+  1. The Raspberry Pi,\n
+  2. An X environment,\n
+  3. An Apple/OSX setup\n
+\n
+are unsupported - likely failing to build.\n
+\n
+*** You are recommended at this time to ENABLE QT5 ***\n
+\n
 Feel free to use this script as a starting point for your own installer on another platform.  This is open-source afterall.'
             post_advice=''
             options_menu
