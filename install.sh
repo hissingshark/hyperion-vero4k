@@ -97,7 +97,7 @@ function install_relative() {
         # tell somebody what we've done
 #        dialog --backtitle "Hyperion$tag Setup on Vero4K - Installation" --title "Advice" --msgbox "The previous configuration files have been moved to /etc/hyperion/backup_$stamp" 0 0
         waitbox "PROGRESS" "The previous configuration files have been moved to /etc/hyperion/backup_$stamp"
-        wait 3
+        sleep 3
     else
         sudo mkdir /etc/hyperion
     fi
