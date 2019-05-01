@@ -442,21 +442,23 @@ Also look out for the Hyperion remote control app in the Google Play Store.'
 \n
 are unsupported - likely failing to build.\n
 \n
-*** You are recommended at this time to ENABLE QT5 ***\n
+*** You are recommended at this time to ENABLE QT5 and DISABLE Tests ***\n
 \n
 Feel free to use this script as a starting point for your own installer on another platform.  This is open-source afterall.'
 
             post_advice='Please refer to the Hyperion wiki for configuration advice.\n
 https://hyperion-project.org/wiki/Main\n
 \n
+There is also some experience on the OSMC forum, specifically the "OSMC and Hyperion" thread in the Vero4k section.\n
+\n
 The configuration file is in /etc/hyperion/\n
-Although it can be edited manually the Java based GUI is recommended:\n
-hypercon.jar (try SourceForge)\n
+Although it can be edited manually the web based GUI is recommended on port :8090 of your server.\n
 \n
 It should be possible to start/stop the Hyperion daemon server with:\n
 sudo systemctl <start/stop> hyperion.service\n
 \n
-Also look out for the Hyperion remote control app in the Google Play Store.'
+The Android Hyperion remote control app in the Google Play Store will NOT work with ng.  There is an experimental app you can try from:\n
+https://github.com/BioHaZard1/hyperion-android'
 
             options_menu
         ;;
