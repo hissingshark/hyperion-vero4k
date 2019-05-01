@@ -160,7 +160,6 @@ function build_from_source() {
 
     # compile list of cmake bool options for building and the checklist dialog
     waitbox "PROGRESS" "Preparing build options checklist"
-#    sudo cmake -DPLATFORM=amlogic .. &>/dev/null
     sudo cmake .. &>/dev/null
     flags=()
     options=()
@@ -236,7 +235,7 @@ function build_from_source() {
     cd ../..
     install_relative
 
-    dialog --title "FINISHED!"--msgbox "Start hyperion with:\nsudo systemctl start hyperion\n\nPlease check the post-installation page - you've still got a lot to do..." 0 0
+    dialog --title "FINISHED!"--msgbox "Start hyperion with\:\nsudo systemctl start hyperion\n\nPlease check the post-installation page - you've still got a lot to do..." 0 0
 }
 
 function uninstall() {
@@ -398,10 +397,10 @@ while true; do
             fatal_depends=(qt5-default)
             systemd_unit='hyperion.systemd.sh'
             repo_url='https://github.com/hyperion-project/hyperion.git'
-            build_advice= \
-'This software is intended for the Vero4K running OSMC, therefore options relating to:\n
+
+            build_advice='This software is intended for the Vero4K running OSMC, therefore options relating to:\n
 \n
-  1. The Raspberry Pi,\n
+  1. The Raspberry Pi (dispmanx),\n
   2. An X environment,\n
   3. An Apple/OSX setup\n
 \n
@@ -410,7 +409,19 @@ are unsupported - likely failing to build.\n
 *** You are recommended at this time to ENABLE QT5 ***\n
 \n
 Feel free to use this script as a starting point for your own installer on another platform.  This is open-source afterall.'
-            post_advice=''
+
+            post_advice='Please refer to the Hyperion wiki for configuration advice.\n
+https://hyperion-project.org/wiki/Main\n
+\n
+The configuration file is in /etc/hyperion/\n
+Although it can be edited manually the Java based GUI is recommended:\n
+hypercon.jar (try SourceForge)\n
+\n
+It should be possible to start/stop the Hyperion daemon server with:\n
+sudo systemctl <start/stop> hyperion.service\n
+\n
+Also look out for the Hyperion remote control app in the Google Play Store.'
+
             options_menu
             ;;
         2 )
@@ -422,10 +433,10 @@ Feel free to use this script as a starting point for your own installer on anoth
             fatal_depends=(libegl1-mesa)
             systemd_unit='hyperion.systemd'
             repo_url='https://github.com/hyperion-project/hyperion.ng.git'
-            build_advice= \
-'This software is intended for the Vero4K running OSMC, therefore options relating to:\n
+
+            build_advice='This software is intended for the Vero4K running OSMC, therefore options relating to:\n
 \n
-  1. The Raspberry Pi,\n
+  1. The Raspberry Pi (dispmanx),\n
   2. An X environment,\n
   3. An Apple/OSX setup\n
 \n
@@ -434,7 +445,19 @@ are unsupported - likely failing to build.\n
 *** You are recommended at this time to ENABLE QT5 ***\n
 \n
 Feel free to use this script as a starting point for your own installer on another platform.  This is open-source afterall.'
-            post_advice=''
+
+            post_advice='Please refer to the Hyperion wiki for configuration advice.\n
+https://hyperion-project.org/wiki/Main\n
+\n
+The configuration file is in /etc/hyperion/\n
+Although it can be edited manually the Java based GUI is recommended:\n
+hypercon.jar (try SourceForge)\n
+\n
+It should be possible to start/stop the Hyperion daemon server with:\n
+sudo systemctl <start/stop> hyperion.service\n
+\n
+Also look out for the Hyperion remote control app in the Google Play Store.'
+
             options_menu
         ;;
     esac
