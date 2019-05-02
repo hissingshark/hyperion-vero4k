@@ -6,6 +6,9 @@ if [ "$EUID" -ne 0 ]; then
     exit
 fi
 
+# stop any running instance of hyperion
+sudo systemctl stop hyperion
+
 #############
 # CONSTANTS #
 #############
@@ -132,7 +135,6 @@ function install_relative() {
     waitbox "Runtime Dependancies" "$msg_list\n"
     depends_install
     waitbox "Installation" "Process Completed!\n"
-#    dialog --title "FINISHED!"--msgbox "Start hyperion with:\nsudo systemctl start hyperion\n\nPlease check the post-installation page - you've still got a lot to do..." 0 0
     dialog --backtitle "Hyperion$tag Setup on Vero4K - Installation" --title "PROGRESS" --msgbox "FINISHED!\n\nStart hyperion with:\nsudo systemctl start hyperion\n\nPlease check the post-installation page - you've still got a lot to do..." 0 0
 }
 
