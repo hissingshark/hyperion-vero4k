@@ -132,7 +132,8 @@ function install_relative() {
     waitbox "Runtime Dependancies" "$msg_list\n"
     depends_install
     waitbox "Installation" "Process Completed!\n"
-    dialog --title "FINISHED!"--msgbox "Start hyperion with\:\nsudo systemctl start hyperion\n\nPlease check the post-installation page - you've still got a lot to do..." 0 0
+#    dialog --title "FINISHED!"--msgbox "Start hyperion with:\nsudo systemctl start hyperion\n\nPlease check the post-installation page - you've still got a lot to do..." 0 0
+    dialog --backtitle "Hyperion$tag Setup on Vero4K - Installation" --title "PROGRESS" --msgbox "FINISHED!\n\nStart hyperion with:\nsudo systemctl start hyperion\n\nPlease check the post-installation page - you've still got a lot to do..." 0 0
 }
 
 function build_from_source() {
@@ -271,8 +272,7 @@ function uninstall() {
         sudo rm -r /etc/hyperion
         waitbox "PROGRESS" "Configuration files deleted"
     fi
-    dialog --title "FINISHED!"--msgbox "Hyperion has been uninstalled" 0 0
-    sleep 5 # but why doesn't it stay by itself?
+    dialog --backtitle "Hyperion$tag Setup on Vero4K - Uninstall" --title "PROGRESS" --msgbox "FINISHED!\n\nHyperion$tag has been uninstalled" 0 0
 }
 
 function post_installation() {
@@ -463,7 +463,8 @@ Although it can be edited manually the web based GUI is recommended on port :809
 It should be possible to start/stop the Hyperion daemon server with:\n
 sudo systemctl <start/stop> hyperion.service\n
 \n
-The Android Hyperion remote control app in the Google Play Store will NOT work with ng.  There is an experimental app you can try from:\n
+The Hyperion Remote control app in the Google Play Store now appears to be working with ng again.\n
+There is also an experimental app you can try from:\n
 https://github.com/BioHaZard1/hyperion-android'
 
             options_menu
