@@ -78,7 +78,7 @@ function install_relative() {
     # copy over bins
     waitbox "PROGRESS" "Installing binaries"
     go build/bin
-    sudo mkdir -p /usr/share/hyperion
+    sudo mkdir -p /usr/share/hyperion/bin
     cp -r tests /usr/share/hyperion
     sudo cp * /usr/bin
 
