@@ -95,7 +95,6 @@ function install_relative() {
         # then remove anything that is not a folder
         rm /etc/hyperion/*
         # tell somebody what we've done
-#        dialog --backtitle "Hyperion$tag Setup on Vero4K - Installation" --title "Advice" --msgbox "The previous configuration files have been moved to /etc/hyperion/backup_$stamp" 0 0
         waitbox "PROGRESS" "The previous configuration files have been moved to /etc/hyperion/backup_$stamp"
         sleep 3
     else
@@ -131,6 +130,7 @@ function install_relative() {
     waitbox "Runtime Dependancies" "$msg_list\n"
     depends_install
     waitbox "Installation" "Process Completed!\n"
+    dialog --title "FINISHED!"--msgbox "Start hyperion with\:\nsudo systemctl start hyperion\n\nPlease check the post-installation page - you've still got a lot to do..." 0 0
 }
 
 function build_from_source() {
@@ -234,8 +234,6 @@ function build_from_source() {
     # install everything
     cd ../..
     install_relative
-
-    dialog --title "FINISHED!"--msgbox "Start hyperion with\:\nsudo systemctl start hyperion\n\nPlease check the post-installation page - you've still got a lot to do..." 0 0
 }
 
 function uninstall() {
@@ -254,19 +252,25 @@ function uninstall() {
     sudo rm /usr/bin/hyperion-v4l2
     sudo rm /usr/bin/hyperiond
     sudo rm /usr/bin/protoc
+    waitbox "PROGRESS" "Binaries deleted"
 
     # delete effects and test programs
     sudo rm -r /usr/share/hyperion
+    waitbox "PROGRESS" "Effects and test programs deleted"
 
     # delete and unregister service
     sudo rm /etc/systemd/system/hyperion.service
     sudo systemctl daemon-reload
+    waitbox "PROGRESS" "Hyperion service unregistered"
 
     # retain configs?
     if (dialog --backtitle "Hyperion$tag Setup on Vero4K - Uninstall" --title "CONFIGURATION FILES!" --defaultno --yes-label "Delete" --no-label "Keep" --yesno "Would you like to DELETE the config files as well?" 0 0); then
         # delete configs
         sudo rm -r /etc/hyperion
+        waitbox "PROGRESS" "Configuration files deleted"
     fi
+
+    dialog --title "FINISHED!"--msgbox "Hyperion has been uninstalled" 0 0
 }
 
 function post_installation() {
