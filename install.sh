@@ -51,6 +51,7 @@ function depends_check() {
 
 function depends_install() {
     if [ ${#missing_depends[@]} -gt 0 ]; then
+        waitbox "Runtime Dependancies" "$msg_list\n"
         sudo apt-get install -y ${missing_depends[@]}
         missing_depends=()
     fi
@@ -132,8 +133,7 @@ function install_relative() {
     for package in "${missing_depends[@]}"; do
         msg_list=("$msg_list  $package\n")
     done
-    waitbox "Runtime Dependancies" "$msg_list\n"
-    depends_install
+    depends_install # uses $missing_depends $msg_list
     waitbox "Installation" "Process Completed!\n"
     dialog --backtitle "Hyperion$tag Setup on Vero4K - Installation" --title "PROGRESS" --msgbox "FINISHED!\n\nStart hyperion with:\nsudo systemctl start hyperion\n\nPlease check the post-installation page - you've still got a lot to do..." 0 0
 }
@@ -215,8 +215,7 @@ function build_from_source() {
     for package in "${missing_depends[@]}"; do
         msg_list=("$msg_list  $package\n")
     done
-    waitbox "Build Dependancies" "$msg_list\n"
-    depends_install
+    depends_install # uses $missing_depends $msg_list
 
     # compile hyperion
     waitbox "Compiling Hyperion$tag" "This will take quite a while, so I'll show you the output to keep you posted..."; sleep 2;
