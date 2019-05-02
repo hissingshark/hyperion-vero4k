@@ -78,9 +78,14 @@ function install_relative() {
     # copy over bins
     waitbox "PROGRESS" "Installing binaries"
     go build/bin
+    if [ -d /usr/share/hyperion ]; then
+        sudo rm -r /usr/share/hyperion
+    fi
     sudo mkdir -p /usr/share/hyperion/bin
     cp -r tests /usr/share/hyperion
-    sudo cp * /usr/bin
+    # in keeping with hyperion's own installer, symlinks to bins, and the service has a "working directory" of /usr/share/hyperion/bin
+    sudo cp * /usr/share/hyperion/bin
+    ln -s /usr/share/hyperion/bin/* /usr/bin/
 
     # copy over configs with backup of the previous config to avoid disappointment
     # bit dirty - uses the fact that cp and rm ignore folders without the --recursive option...
@@ -105,10 +110,7 @@ function install_relative() {
     # (re)make effects folders and copy over
     waitbox "PROGRESS" "Installing effects"
     go ../effects
-    if [ -d /usr/share/hyperion ]; then
-        sudo rm -r /usr/share/hyperion
-    fi
-    sudo mkdir -p /usr/share/hyperion/effects
+    sudo mkdir /usr/share/hyperion/effects
     sudo cp * /usr/share/hyperion/effects
 
     # copy over systemd script and register
@@ -269,8 +271,8 @@ function uninstall() {
         sudo rm -r /etc/hyperion
         waitbox "PROGRESS" "Configuration files deleted"
     fi
-
     dialog --title "FINISHED!"--msgbox "Hyperion has been uninstalled" 0 0
+    sleep 5 # but why doesn't it stay by itself?
 }
 
 function post_installation() {
