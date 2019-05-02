@@ -134,8 +134,7 @@ function install_relative() {
         msg_list=("$msg_list  $package\n")
     done
     depends_install # uses $missing_depends $msg_list
-    waitbox "Installation" "Process Completed!\n"
-    dialog --backtitle "Hyperion$tag Setup on Vero4K - Installation" --title "PROGRESS" --msgbox "FINISHED!\n\nStart hyperion with:\nsudo systemctl start hyperion\n\nPlease check the post-installation page - you've still got a lot to do..." 0 0
+    dialog --backtitle "Hyperion$tag Setup on Vero4K - Installation" --title "PROGRESS" --msgbox "INSTALLATION COMPLETED!\n\nStart hyperion with:\nsudo systemctl start hyperion\n\nPlease check the post-installation page - you've still got a lot to do..." 0 0
 }
 
 function build_from_source() {
