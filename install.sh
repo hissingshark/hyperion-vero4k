@@ -29,6 +29,7 @@ post_advice=()
 msg_list=()
 
 declare -a LINK_LIST=(/usr/bin/flatc /usr/bin/flathash /usr/bin/gpio2spi /usr/bin/hyperion-aml /usr/bin/hyperion-framebuffer /usr/bin/hyperion-remote /usr/bin/hyperion-v4l2 /usr/bin/hyperiond /usr/bin/protoc)
+declare -a PREBUILD_DEPENDS=(git cmake build-essential)
 declare -a build_depends
 declare -a run_depends
 declare -a fatal_depends
@@ -150,6 +151,15 @@ function build_from_source() {
     export CPPFLAGS=$CFLAGS
     export CXXFLAGS=$CFLAGS
 
+    # check and get prebuild dependancies
+    waitbox "PROGRESS" "Checking for missing pre-build dependancies"
+    depends_check ${PREBUILD_DEPENDS[@]}
+    msg_list='Installing:\n'
+    for package in "${missing_depends[@]}"; do
+        msg_list=("$msg_list  $package\n")
+    done
+    depends_install # uses $missing_depends $msg_list
+
     # clone the source repo
     waitbox "Git Clone" "Downloading the Hyperion$tag project repository"
     if [ -d ./source_$edition ]; then
@@ -209,10 +219,9 @@ function build_from_source() {
         return
     fi
 
-    # check and get dependancies
+    # check and get build dependancies
     waitbox "PROGRESS" "Checking for missing build dependancies"
     depends_check ${build_depends[@]}
-
     msg_list='Installing:\n'
     for package in "${missing_depends[@]}"; do
         msg_list=("$msg_list  $package\n")
@@ -343,8 +352,8 @@ It will also be an older version, so consider building from source once you've t
 # EXECUTION BEGINS #
 ####################
 
-# check for dialog and cmake
-depends_check dialog cmake
+# check for dialog
+depends_check dialog
 
 if [ ${#missing_depends[@]} -gt 0 ]; then
     clear
@@ -393,7 +402,7 @@ while true; do
             # configure installer for hyperion "classic"
             edition='classic'
             tag=' "classic"'
-            build_depends=(git cmake build-essential qt5-default libusb-1.0-0-dev libpython3.5-dev)
+            build_depends=(qt5-default libusb-1.0-0-dev libpython3.5-dev)
             run_depends=(libqt5core5a libqt5gui5 libqt5widgets5 libqt5network5 libusb-1.0-0 libpython3.5)
             fatal_depends=(qt5-default)
             systemd_unit='hyperion.systemd.sh'
@@ -429,7 +438,7 @@ Also look out for the Hyperion remote control app in the Google Play Store.'
             # configure installer for hyperion.ng
             edition='nextgen'
             tag='.ng'
-            build_depends=(vero3-userland-dev-osmc git cmake build-essential qtbase5-dev libqt5serialport5-dev libusb-1.0-0-dev libpython3.5-dev)
+            build_depends=(vero3-userland-dev-osmc qtbase5-dev libqt5serialport5-dev libusb-1.0-0-dev libpython3.5-dev)
             run_depends=(libqt5concurrent5 libqt5core5a libqt5dbus5 libqt5gui5 libqt5network5 libqt5printsupport5 libqt5serialport5 libqt5sql5 libqt5test5 libqt5widgets5 libqt5xml5 libusb-1.0-0 libpython3.5) # qt5-qmake)
             fatal_depends=(libegl1-mesa)
             systemd_unit='hyperion.systemd'
