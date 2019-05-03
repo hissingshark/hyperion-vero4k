@@ -28,6 +28,7 @@ build_advice=()
 post_advice=()
 msg_list=()
 
+declare -a LINK_LIST=(/usr/bin/flatc /usr/bin/flathash /usr/bin/gpio2spi /usr/bin/hyperion-aml /usr/bin/hyperion-framebuffer /usr/bin/hyperion-remote /usr/bin/hyperion-v4l2 /usr/bin/hyperiond /usr/bin/protoc)
 declare -a build_depends
 declare -a run_depends
 declare -a fatal_depends
@@ -89,7 +90,9 @@ function install_relative() {
     cp -r tests /usr/share/hyperion
     # in keeping with hyperion's own installer, symlinks to bins, and the service has a "working directory" of /usr/share/hyperion/bin
     sudo cp * /usr/share/hyperion/bin
-    ln -s /usr/share/hyperion/bin/* /usr/bin/
+    # delete existing bin syslinks first in case there are fewer to be added
+    sudo rm  ${LINK_LIST[@]}
+    ln -sf /usr/share/hyperion/bin/* /usr/bin/
 
     # copy over configs with backup of the previous config to avoid disappointment
     # bit dirty - uses the fact that cp and rm ignore folders without the --recursive option...
@@ -245,19 +248,11 @@ function uninstall() {
         return
     fi
 
-    # delete bins
-    sudo rm /usr/bin/flatc
-    sudo rm /usr/bin/flathash
-    sudo rm /usr/bin/gpio2spi
-    sudo rm /usr/bin/hyperion-aml
-    sudo rm /usr/bin/hyperion-framebuffer
-    sudo rm /usr/bin/hyperion-remote
-    sudo rm /usr/bin/hyperion-v4l2
-    sudo rm /usr/bin/hyperiond
-    sudo rm /usr/bin/protoc
+    # delete bin sysmlinks
+    sudo rm  ${LINK_LIST[@]}
     waitbox "PROGRESS" "Binaries deleted"
 
-    # delete effects and test programs
+    # delete bins, effects and test programs
     sudo rm -r /usr/share/hyperion
     waitbox "PROGRESS" "Effects and test programs deleted"
 
@@ -435,7 +430,7 @@ Also look out for the Hyperion remote control app in the Google Play Store.'
             edition='nextgen'
             tag='.ng'
             build_depends=(vero3-userland-dev-osmc git cmake build-essential qtbase5-dev libqt5serialport5-dev libusb-1.0-0-dev libpython3.5-dev)
-            run_depends=(vero3-userland-osmc libqt5concurrent5 libqt5core5a libqt5dbus5 libqt5gui5 libqt5network5 libqt5printsupport5 libqt5serialport5 libqt5sql5 libqt5test5 libqt5widgets5 libqt5xml5 qt5-qmake)
+            run_depends=(libqt5concurrent5 libqt5core5a libqt5dbus5 libqt5gui5 libqt5network5 libqt5printsupport5 libqt5serialport5 libqt5sql5 libqt5test5 libqt5widgets5 libqt5xml5 libusb-1.0-0 libpython3.5) # qt5-qmake)
             fatal_depends=(libegl1-mesa)
             systemd_unit='hyperion.systemd'
             repo_url='https://github.com/hyperion-project/hyperion.ng.git'
