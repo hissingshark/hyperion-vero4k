@@ -38,10 +38,12 @@ declare -a flags
 declare -a options
 declare -a buildcmd
 
+
 ####################
 # HELPER FUNCTIONS #
 ####################
 
+# takes a list of packages and sets $missing_depends to those uninstalled
 function depends_check() {
     missing_depends=()
     for package in $@; do
@@ -51,14 +53,25 @@ function depends_check() {
     done
 }
 
+
+# takes a list of packages and installs those supplied by depends_check in $missing_depends
 function depends_install() {
+    depends_check $@
+
+    msg_list='Installing:\n'
+    for package in "${missing_depends[@]}"; do
+        msg_list=("$msg_list  $package\n")
+    done
+
     if [ ${#missing_depends[@]} -gt 0 ]; then
-        waitbox "Runtime Dependancies" "$msg_list\n"
+        waitbox "Package Management" "$msg_list\n"
         sudo apt-get install -y ${missing_depends[@]}
         missing_depends=()
     fi
 }
 
+
+# changes working directory whilst checking for a legitimate path
 function go() {
     if [ -d $1 ]; then
         cd $1
@@ -69,10 +82,12 @@ function go() {
     fi
 }
 
+# takes a heading and body text string for a momentary notification
 function waitbox() {
     dialog --title "PLEASE WAIT..." --infobox "$1:\n\n$2" 0 0
     sleep 2
 }
+
 
 ##################
 # MAIN FUNCTIONS #
@@ -132,14 +147,11 @@ function install_relative() {
 
     # install runtime dependancies
     waitbox "PROGRESS" "Checking for missing runtime dependancies"
-    depends_check ${run_depends[@]}
-    msg_list='Installing:\n'
-    for package in "${missing_depends[@]}"; do
-        msg_list=("$msg_list  $package\n")
-    done
-    depends_install # uses $missing_depends $msg_list
+    depends_install ${run_depends[@]}
+
     dialog --backtitle "Hyperion$tag Setup on Vero4K - Installation" --title "PROGRESS" --msgbox "INSTALLATION COMPLETED!\n\nStart hyperion with:\nsudo systemctl start hyperion\n\nPlease check the post-installation page - you've still got a lot to do..." 0 0
 }
+
 
 function build_from_source() {
     if (! dialog --backtitle "Hyperion$tag Setup on Vero4K - Build from source" --title "PROCEED?" --defaultno --no-label "Abort" --yesno "This will delete previous build files and folders.\n\nIt will attempt to preserve old configs..." 0 0); then
@@ -153,12 +165,7 @@ function build_from_source() {
 
     # check and get prebuild dependancies
     waitbox "PROGRESS" "Checking for missing pre-build dependancies"
-    depends_check ${PREBUILD_DEPENDS[@]}
-    msg_list='Installing:\n'
-    for package in "${missing_depends[@]}"; do
-        msg_list=("$msg_list  $package\n")
-    done
-    depends_install # uses $missing_depends $msg_list
+    depends_install ${PREBUILD_DEPENDS[@]}
 
     # clone the source repo
     waitbox "Git Clone" "Downloading the Hyperion$tag project repository"
@@ -221,12 +228,7 @@ function build_from_source() {
 
     # check and get build dependancies
     waitbox "PROGRESS" "Checking for missing build dependancies"
-    depends_check ${build_depends[@]}
-    msg_list='Installing:\n'
-    for package in "${missing_depends[@]}"; do
-        msg_list=("$msg_list  $package\n")
-    done
-    depends_install # uses $missing_depends $msg_list
+    depends_install ${build_depends[@]}
 
     # compile hyperion
     waitbox "Compiling Hyperion$tag" "This will take quite a while, so I'll show you the output to keep you posted..."; sleep 2;
@@ -250,6 +252,7 @@ function build_from_source() {
     cd ../..
     install_relative
 }
+
 
 function uninstall() {
     # chance to back out
@@ -279,12 +282,14 @@ function uninstall() {
     dialog --backtitle "Hyperion$tag Setup on Vero4K - Uninstall" --title "PROGRESS" --msgbox "FINISHED!\n\nHyperion$tag has been uninstalled" 0 0
 }
 
+
 function post_installation() {
   dialog --title "Hyperion$tag: Post Installation Advice" \
     --no-collapse \
     --msgbox \
     "$post_advice" 0 0
 }
+
 
 function options_menu() {
     while true; do
@@ -348,6 +353,7 @@ It will also be an older version, so consider building from source once you've t
     done
 }
 
+
 ####################
 # EXECUTION BEGINS #
 ####################
@@ -359,10 +365,8 @@ if [ ${#missing_depends[@]} -gt 0 ]; then
     clear
     echo -e "\n\n*****\nFor first time use I need to install:\n\n${missing_depends[@]}\n\nPlease wait...\n**********\n\n"
     sleep 3
+    sudo apt-get install -y dialog
 fi
-
-# install missing dependancies
-depends_install
 
 # start main menu
 while true; do
