@@ -21,7 +21,7 @@ DIALOG_ESC=255
 # VARIABLES #
 #############
 
-REPO_DIR=$(pwd)
+REPO_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 edition=()
 tag=()
 build_advice=()
