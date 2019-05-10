@@ -22,7 +22,10 @@ This software is intended for the Vero4K running OSMC, therefore options relatin
 
 are unsupported - likely failing to build.
 
-*** You are recommended at this time to ENABLE QT5 and DISABLE Tests ***
+**You are recommended at this time to: **
+** ENABLE QT5**
+** DISABLE V4L2**
+** DISABLE Tests**
 ```
 ---
 # Post install
