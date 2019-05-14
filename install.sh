@@ -22,6 +22,7 @@ DIALOG_ESC=255
 #############
 
 REPO_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+COMMIT=$1
 edition=()
 tag=()
 build_advice=()
@@ -174,6 +175,13 @@ function build_from_source() {
     fi
     git clone --recursive $repo_url source_$edition
     go source_$edition
+
+    # checkout older commit supplied on the command line
+    if [[ -n $COMMIT ]]; then
+        waitbox "Git Checking Out:" "Commit #$COMMIT"
+        git fetch
+        git checkout $COMMIT
+    fi
 
     # remove build dir if it exists and start anew
     if [ -d ./build ]; then
