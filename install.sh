@@ -467,7 +467,10 @@ Also look out for the Hyperion remote control app in the Google Play Store.'
 \n
 are unsupported - likely failing to build.\n
 \n
-*** You are recommended at this time to ENABLE QT5 and DISABLE Tests ***\n
+You are recommended at this time to:\n
+   ENABLE QT5\n
+   DISABLE Tests\n
+   DISABLE V4L2\n
 \n
 Feel free to use this script as a starting point for your own installer on another platform.  This is open-source afterall.'
 
