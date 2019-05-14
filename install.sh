@@ -181,6 +181,9 @@ function build_from_source() {
         waitbox "Git Checking Out:" "Commit #$COMMIT"
         git fetch
         git checkout $COMMIT
+    else
+        waitbox "Git Checking Out:" "Commit #101855f"
+        git checkout 101855f
     fi
 
     # remove build dir if it exists and start anew
