@@ -445,6 +445,9 @@ hypercon.jar (try SourceForge)\n
 It should be possible to start/stop the Hyperion daemon server with:\n
 sudo systemctl <start/stop> hyperion.service\n
 \n
+Make the daemon server start automatically at boot with:\n
+sudo systemctl <enable/disable> hyperion.service\n
+\n
 Also look out for the Hyperion remote control app in the Google Play Store.'
 
             options_menu
@@ -484,6 +487,9 @@ Although it can be edited manually the web based GUI is recommended on port :809
 \n
 It should be possible to start/stop the Hyperion daemon server with:\n
 sudo systemctl <start/stop> hyperion.service\n
+\n
+Make the daemon server start automatically at boot with:\n
+sudo systemctl <enable/disable> hyperion.service\n
 \n
 The Hyperion Remote control app in the Google Play Store now appears to be working with ng again.\n
 There is also an experimental app you can try from:\n
