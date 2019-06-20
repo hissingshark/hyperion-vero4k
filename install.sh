@@ -159,8 +159,8 @@ function build_from_source() {
         return
     fi
 
-    # configure build environment - particularly it avoids floating point runtime error
-    export CFLAGS="-I/opt/vero3/include -L/opt/vero3/lib -O3 -march=armv8-a+crc -mtune=cortex-a53 -mfpu=neon-fp-armv8 -mfloat-abi=hard -ftree-vectorize -funsafe-math-optimizations"
+    # configure build environment - particularly it avoids floating point runtime error - now building for armv7 instead
+    export CFLAGS="-I/opt/vero3/include -L/opt/vero3/lib -O3 -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -ftree-vectorize -funsafe-math-optimizations"
     export CPPFLAGS=$CFLAGS
     export CXXFLAGS=$CFLAGS
 
@@ -176,14 +176,11 @@ function build_from_source() {
     git clone --recursive $repo_url source_$edition
     go source_$edition
 
-    # checkout older commit supplied on the command line
+    # checkout older commit if supplied on the command line else we'll try building from master
     if [[ -n $COMMIT ]]; then
         waitbox "Git Checking Out:" "Commit #$COMMIT"
         git fetch
         git checkout $COMMIT
-    else
-        waitbox "Git Checking Out:" "Commit #101855f"
-        git checkout 101855f
     fi
 
     # remove build dir if it exists and start anew
