@@ -140,6 +140,8 @@ function install_relative() {
     # copy over systemd script and register
     waitbox "PROGRESS" "Registering hyperion service"
     go ../bin/service
+    # first fix the unit file - uses %i as user name, which isn't supported in systemd (?OSMC on an out of date version)
+    sed -i 's/%i/osmc/g' $systemd_unit
     sudo cp $systemd_unit /etc/systemd/system/hyperion.service
     sudo systemctl daemon-reload
 
@@ -176,11 +178,16 @@ function build_from_source() {
     git clone --recursive $repo_url source_$edition
     go source_$edition
 
-    # checkout older commit if supplied on the command line else we'll try building from master
+    # checkout older commit if supplied on the command line else we'll build from last known good commit
     if [[ -n $COMMIT ]]; then
         waitbox "Git Checking Out:" "Commit #$COMMIT"
         git fetch
         git checkout $COMMIT
+    else
+        # b1b2079 - when the a/v sync bug with amvideocap device was fixed
+        waitbox "Git Checking Out:" "Commit #b1b2079"
+        git fetch
+        git checkout $b1b2079
     fi
 
     # remove build dir if it exists and start anew
