@@ -187,7 +187,7 @@ function build_from_source() {
         # b1b2079 - when the a/v sync bug with amvideocap device was fixed
         waitbox "Git Checking Out:" "Commit #b1b2079"
         git fetch
-        git checkout $b1b2079
+        git checkout b1b2079
     fi
 
     # remove build dir if it exists and start anew
