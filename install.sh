@@ -175,11 +175,18 @@ function build_from_source() {
     if [ -d ./source_$edition ]; then
         rm -r source_$edition
     fi
-    git clone --recursive $repo_url source_$edition
+
+    if [[ "$COMMIT" == "hue" ]]; then # emergency measures for Philips Hue users - not perfect but limping along for now
+        waitbox "Git Clone" "Using the out-of-date api-entertainment fork for Philips Hue users"
+        git clone --recursive --single-branch --branch entertainment-api https://github.com/SJunkies/hyperion.ng.git source_$edition
+    else
+        git clone --recursive $repo_url source_$edition
+    fi
     go source_$edition
 
     # checkout older commit if supplied on the command line else we'll build from last known good commit
     if [[ -n $COMMIT ]]; then
+        [[ "$COMMIT" == "hue" ]] && COMMIT=d78da90 # emergency measures for Philips Hue users - not perfect but limping along for now
         waitbox "Git Checking Out:" "Commit #$COMMIT"
         git fetch
         git checkout $COMMIT
