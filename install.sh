@@ -406,7 +406,7 @@ while true; do
         --item-help \
         --menu "Please select:" 0 0 2 \
         "1" "Hyperion \"classic\"" "The original version of Hyperion." \
-        "2" "Hyperion.ng" "The pre-alpha development version of Hyperion.  Fun fact: \".ng\" stands for Next Generation.  I did not know that." \
+        "2" "Hyperion.ng" "The beta development version of Hyperion.  Fun fact: \".ng\" stands for Next Generation.  I did not know that." \
         2>&1 1>&3)
     ret_val=$?
     exec 3>&-
