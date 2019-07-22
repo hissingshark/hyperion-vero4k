@@ -95,7 +95,7 @@ function waitbox() {
 ##################
 
 function install_relative() {
-    # all operations wil be relative to the current working directory, so must be set correctly before calling
+    # most operations will be relative to the current working directory, so must be set correctly before calling
 
     # copy over bins
     waitbox "PROGRESS" "Installing binaries"
@@ -110,6 +110,8 @@ function install_relative() {
     # delete existing bin syslinks first in case there are fewer to be added
     sudo rm  ${LINK_LIST[@]}
     ln -sf /usr/share/hyperion/bin/* /usr/bin/
+    # copy over script for changing double_write_mode (fixes 4K issues)
+    cp $REPO_DIR/assets/drmctl.sh /usr/share/hyperion/bin
 
     # copy over configs with backup of the previous config to avoid disappointment
     # bit dirty - uses the fact that cp and rm ignore folders without the --recursive option...
@@ -142,6 +144,9 @@ function install_relative() {
     go ../bin/service
     # first fix the unit file - uses %i as user name, which isn't supported in systemd (?OSMC on an out of date version)
     sed -i 's/%i/osmc/g' $systemd_unit
+    # also add the pre/post-run call to drmctl.sh
+    sed -i '/ExecStart=/i ExecStartPre=/bin/sh -c "exec sh /usr/share/hyperion/bin/drmctl.sh start"' $systemd_unit
+    sed -i '/ExecStart=/a ExecStopPost=/bin/sh -c "exec sh /usr/share/hyperion/bin/drmctl.sh stop"' $systemd_unit
     sudo cp $systemd_unit /etc/systemd/system/hyperion.service
     sudo systemctl daemon-reload
 
