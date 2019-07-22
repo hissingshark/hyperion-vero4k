@@ -110,7 +110,7 @@ function install_relative() {
     # delete existing bin syslinks first in case there are fewer to be added
     sudo rm  ${LINK_LIST[@]}
     ln -sf /usr/share/hyperion/bin/* /usr/bin/
-    # copy over script for changing double_write_mode (fixes 4K issues)
+    # copy over Lancelot script for changing double_write_mode (fixes 4K issues)
     cp $REPO_DIR/assets/drmctl.sh /usr/share/hyperion/bin
 
     # copy over configs with backup of the previous config to avoid disappointment

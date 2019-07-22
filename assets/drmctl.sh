@@ -16,3 +16,6 @@ if [ -d /sys/module/amvdec_h265 ] && [ -d /sys/module/amvdec_vp9 ];then
     ;;
     esac
 fi
+
+# contributed by Lancelot on the OSMC forum
+# fixes glitches when using Hyperion with 4K content
