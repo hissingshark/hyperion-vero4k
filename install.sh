@@ -182,8 +182,9 @@ function build_from_source() {
     fi
 
     if [[ "$COMMIT" == "hue" ]]; then # emergency measures for Philips Hue users - not perfect but limping along for now
-        waitbox "Git Clone" "Using the out-of-date api-entertainment fork for Philips Hue users"
-        git clone --recursive --single-branch --branch entertainment-api https://github.com/SJunkies/hyperion.ng.git source_$edition
+        waitbox "Git Clone" "Using the 2019 beta api-entertainment fork for Philips Hue users"
+        git clone --recursive --single-branch --branch entertainment-api-2019 https://github.com/SJunkies/hyperion.ng.git source_$edition
+        git -C source_$edition checkout d6a5084
     else
         git clone --recursive $repo_url source_$edition
     fi
