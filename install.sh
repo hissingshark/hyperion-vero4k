@@ -473,7 +473,7 @@ Also look out for the Hyperion remote control app in the Google Play Store.'
             # configure installer for hyperion.ng
             edition='nextgen'
             tag='.ng'
-            build_depends=(vero3-userland-dev-osmc qtbase5-dev libqt5serialport5-dev libusb-1.0-0-dev libpython3.5-dev libxrender-dev libavahi-core-dev libavahi-compat-libdnssd-dev libmbedtls-dev libpcre3-dev zlib1g-dev)
+            build_depends=(vero3-userland-dev-osmc qtbase5-dev libqt5serialport5-dev libusb-1.0-0-dev libpython3.5-dev libxrender-dev libavahi-core-dev libavahi-compat-libdnssd-dev libmbedtls-dev libpcre3-dev zlib1g-dev libjpeg-dev libqt5sql5-sqlite)
             run_depends=(libqt5concurrent5 libqt5core5a libqt5dbus5 libqt5gui5 libqt5network5 libqt5printsupport5 libqt5serialport5 libqt5sql5 libqt5test5 libqt5widgets5 libqt5xml5 libusb-1.0-0 libpython3.5 qt5-qmake)
             fatal_depends=(libegl1-mesa)
             systemd_unit='hyperion.systemd'
