@@ -30,7 +30,7 @@ post_advice=()
 msg_list=()
 
 declare -a LINK_LIST=(/usr/bin/flatc /usr/bin/flathash /usr/bin/gpio2spi /usr/bin/hyperion-aml /usr/bin/hyperion-framebuffer /usr/bin/hyperion-remote /usr/bin/hyperion-v4l2 /usr/bin/hyperiond /usr/bin/protoc)
-declare -a PREBUILD_DEPENDS=(git cmake build-essential)
+declare -a PREBUILD_DEPENDS=(git cmake build-essential python3.5)
 declare -a build_depends
 declare -a run_depends
 declare -a fatal_depends
