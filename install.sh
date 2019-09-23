@@ -9,6 +9,8 @@ fi
 # stop any running instance of hyperion
 sudo systemctl stop hyperion
 
+
+
 #############
 # CONSTANTS #
 #############
@@ -17,27 +19,31 @@ DIALOG_OK=0
 DIALOG_CANCEL=1
 DIALOG_ESC=255
 
+REPO_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+CUSTOM_COMMIT=$1
+STABLE_COMMIT='b1b2079' # when the a/v sync bug with amvideocap device was fixed - will update after Hue integration is merged in.
+SYSTEMD_UNIT='hyperion.systemd'
+REPO_URL='https://github.com/hyperion-project/hyperion.ng.git'
+
+declare -a PREBUILD_DEPENDS=(git cmake build-essential python3.5)
+declare -a BUILD_DEPENDS=(vero3-userland-dev-osmc qtbase5-dev libqt5serialport5-dev libusb-1.0-0-dev libpython3.5-dev libxrender-dev libavahi-core-dev libavahi-compat-libdnssd-dev libmbedtls-dev libpcre3-dev zlib1g-dev libjpeg-dev libqt5sql5-sqlite)
+declare -a RUN_DEPENDS=(libqt5concurrent5 libqt5core5a libqt5dbus5 libqt5gui5 libqt5network5 libqt5printsupport5 libqt5serialport5 libqt5sql5 libqt5test5 libqt5widgets5 libqt5xml5 libusb-1.0-0 libpython3.5 qt5-qmake)
+declare -a FATAL_DEPENDS=(libegl1-mesa)
+declare -a LINK_LIST=(/usr/bin/flatc /usr/bin/flathash /usr/bin/gpio2spi /usr/bin/hyperion-aml /usr/bin/hyperion-framebuffer /usr/bin/hyperion-remote /usr/bin/hyperion-v4l2 /usr/bin/hyperiond /usr/bin/protoc)
+
+
+
 #############
 # VARIABLES #
 #############
 
-REPO_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-COMMIT=$1
-edition=()
-tag=()
-build_advice=()
-post_advice=()
 msg_list=()
 
-declare -a LINK_LIST=(/usr/bin/flatc /usr/bin/flathash /usr/bin/gpio2spi /usr/bin/hyperion-aml /usr/bin/hyperion-framebuffer /usr/bin/hyperion-remote /usr/bin/hyperion-v4l2 /usr/bin/hyperiond /usr/bin/protoc)
-declare -a PREBUILD_DEPENDS=(git cmake build-essential python3.5)
-declare -a build_depends
-declare -a run_depends
-declare -a fatal_depends
 declare -a missing_depends
 declare -a flags
 declare -a options
 declare -a buildcmd
+
 
 
 ####################
@@ -83,6 +89,7 @@ function go() {
     fi
 }
 
+
 # takes a heading and body text string for a momentary notification
 function waitbox() {
     dialog --title "PLEASE WAIT..." --infobox "$1:\n\n$2" 0 0
@@ -90,9 +97,31 @@ function waitbox() {
 }
 
 
+
 ##################
 # MAIN FUNCTIONS #
 ##################
+
+
+function install_from_binary() {
+    dialog --backtitle "Hyperion.ng Setup on Vero4K - Install from binary" --title "Advice" --msgbox \
+"This will install a prebuilt version of Hyperion.ng with the most common Vero4K compatible compilation options enabled.\n
+\n
+It will be an older version, but also a working one.\n
+\n
+Please only consider building from source if you need a specific version for a bug fix or feature." 0 0
+
+    if (dialog --backtitle "Hyperion.ng Setup on Vero4K - Install from binary" --title "PROCEED?" --defaultno --no-label "Abort" --yesno \
+	  "This will delete any previous build files and folders you may have.\n
+\n
+It will not remove any old configs.  This will save you time if everything is working as it should.\n
+\n
+However, if you experience problems with your cutting edge build it might be worth running an uninstall first to delete them - in case the developers have changed something about how they work..." 0 0); then
+        cd $REPO_DIR/prebuilt
+        install_relative
+    fi
+}
+
 
 function install_relative() {
     # most operations will be relative to the current working directory, so must be set correctly before calling
@@ -113,56 +142,60 @@ function install_relative() {
     # copy over Lancelot script for changing double_write_mode (fixes 4K issues)
     cp $REPO_DIR/assets/drmctl.sh /usr/share/hyperion/bin
 
-    # copy over configs with backup of the previous config to avoid disappointment
-    # bit dirty - uses the fact that cp and rm ignore folders without the --recursive option...
-    waitbox "PROGRESS" "Installing configuration files"
-    go ../../config
-    if [ -d /etc/hyperion ]; then
-        stamp=$(date +'%Y-%m-%d_%H%M%S')
-        # create a time stamped backup folder
-        sudo mkdir /etc/hyperion/backup_$stamp
-        # then copy over anything that is not a folder
-        cp /etc/hyperion/* /etc/hyperion/backup_$stamp
-        # then remove anything that is not a folder
-        rm /etc/hyperion/*
-        # tell somebody what we've done
-        waitbox "PROGRESS" "The previous configuration files have been moved to /etc/hyperion/backup_$stamp"
-        sleep 3
-    else
-        sudo mkdir /etc/hyperion
-    fi
-    sudo cp * /etc/hyperion
-
     # (re)make effects folders and copy over
     waitbox "PROGRESS" "Installing effects"
-    go ../effects
+    go ../../effects
     sudo mkdir /usr/share/hyperion/effects
     sudo cp * /usr/share/hyperion/effects
 
     # copy over systemd script and register
     waitbox "PROGRESS" "Registering hyperion service"
     go ../bin/service
-    # first fix the unit file - uses %i as user name, which isn't supported in systemd (?OSMC on an out of date version)
-    sed -i 's/%i/osmc/g' $systemd_unit
+    sudo cp $SYSTEMD_UNIT /etc/systemd/system/hyperion.service
+    # fix the unit file - uses %i as user name, which isn't supported in systemd (?OSMC on an out of date version)
+    sudo sed -i 's/%i/osmc/g' /etc/systemd/system/hyperion.service
     # also add the pre/post-run call to drmctl.sh
-    sed -i '/ExecStart=/i ExecStartPre=/bin/sh -c "exec sh /usr/share/hyperion/bin/drmctl.sh start"' $systemd_unit
-    sed -i '/ExecStart=/a ExecStopPost=/bin/sh -c "exec sh /usr/share/hyperion/bin/drmctl.sh stop"' $systemd_unit
-    sudo cp $systemd_unit /etc/systemd/system/hyperion.service
+    sudo sed -i '/ExecStart=/i ExecStartPre=/bin/sh -c "exec sh /usr/share/hyperion/bin/drmctl.sh start"' /etc/systemd/system/hyperion.service
+    sudo sed -i '/ExecStart=/a ExecStopPost=/bin/sh -c "exec sh /usr/share/hyperion/bin/drmctl.sh stop"' /etc/systemd/system/hyperion.service
     sudo systemctl daemon-reload
 
     # return to base
-    cd ../../..
+    cd $REPO_DIR
 
     # install runtime dependancies
     waitbox "PROGRESS" "Checking for missing runtime dependancies"
-    depends_install ${run_depends[@]}
+    depends_install ${RUN_DEPENDS[@]}
 
-    dialog --backtitle "Hyperion$tag Setup on Vero4K - Installation" --title "PROGRESS" --msgbox "INSTALLATION COMPLETED!\n\nStart hyperion with:\nsudo systemctl start hyperion\n\nPlease check the post-installation page - you've still got a lot to do..." 0 0
+    dialog --backtitle "Hyperion.ng Setup on Vero4K - Installation" --title "PROGRESS" --msgbox "INSTALLATION COMPLETED!\n\nStart hyperion with:\nsudo systemctl start hyperion\n\nPlease check the post-installation page - you've still got a lot to do..." 0 0
 }
 
 
 function build_from_source() {
-    if (! dialog --backtitle "Hyperion$tag Setup on Vero4K - Build from source" --title "PROCEED?" --defaultno --no-label "Abort" --yesno "This will delete previous build files and folders.\n\nIt will attempt to preserve old configs..." 0 0); then
+    dialog --backtitle "Hyperion.ng Setup on Vero4K - Build from source" --title "Advice" --msgbox \
+"This software is intended for the Vero4K running OSMC, therefore options relating to:\n
+\n
+  1. The Raspberry Pi (dispmanx),\n
+  2. An X environment,\n
+  3. An Apple/OSX setup\n
+\n
+are unsupported - likely failing to build.\n
+\n
+You are recommended at this time to:\n
+   ENABLE AMLOGIC\n
+   ENABLE FB\n
+\n
+   DISABLE Tests\n
+   DISABLE V4L2\n
+   and everything else to be honest.\n
+\n
+Feel free to use this script as a starting point for your own installer on another platform.  This is open-source afterall." 0 0
+
+    if (! dialog --backtitle "Hyperion.ng Setup on Vero4K - Build from source" --title "PROCEED?" --defaultno --no-label "Abort" --yesno \
+	  "This will delete any previous build files and folders you may have.\n
+\n
+It will not remove any old configs.  This will save you time if everything is working as it should.\n
+\n
+However, if you experience problems with your cutting edge build it might be worth running an uninstall first to delete them - in case the developers have changed something about how they work..." 0 0); then
         return
     fi
 
@@ -175,32 +208,31 @@ function build_from_source() {
     waitbox "PROGRESS" "Checking for missing pre-build dependancies"
     depends_install ${PREBUILD_DEPENDS[@]}
 
+    cd $REPO_DIR
+
     # clone the source repo
-    waitbox "Git Clone" "Downloading the Hyperion$tag project repository"
-    if [ -d ./source_$edition ]; then
-        rm -r source_$edition
+    waitbox "Git Clone" "Downloading the Hyperion.ng project repository"
+    if [ -d ./source ]; then
+        rm -r source
     fi
 
-    if [[ "$COMMIT" == "hue" ]]; then # emergency measures for Philips Hue users - not perfect but limping along for now
+    if [[ "$CUSTOM_COMMIT" == "hue" ]]; then # emergency measures for Philips Hue users - not perfect but limping along for now
         waitbox "Git Clone" "Using the 2019 beta api-entertainment fork for Philips Hue users"
-        git clone --recursive --single-branch --branch entertainment-api-2019 https://github.com/SJunkies/hyperion.ng.git source_$edition
-        git -C source_$edition checkout d6a5084
+        git clone --recursive --single-branch --branch entertainment-api-2019 https://github.com/SJunkies/hyperion.ng.git source
+        CUSTOM_COMMIT='d6a5084' # last known good commit for Hue - development too unstable to just take the latest
     else
-        git clone --recursive $repo_url source_$edition
+        git clone --recursive $REPO_URL source
     fi
-    go source_$edition
+    go source
+    git fetch
 
     # checkout older commit if supplied on the command line else we'll build from last known good commit
-    if [[ -n $COMMIT ]]; then
-        [[ "$COMMIT" == "hue" ]] && COMMIT=d78da90 # emergency measures for Philips Hue users - not perfect but limping along for now
-        waitbox "Git Checking Out:" "Commit #$COMMIT"
-        git fetch
-        git checkout $COMMIT
+    if [[ -n $CUSTOM_COMMIT ]]; then
+        waitbox "Git Checking Out:" "Commit #$CUSTOM_COMMIT"
+        git checkout $CUSTOM_COMMIT
     else
-        # b1b2079 - when the a/v sync bug with amvideocap device was fixed
-        waitbox "Git Checking Out:" "Commit #b1b2079"
-        git fetch
-        git checkout b1b2079
+        waitbox "Git Checking Out:" "Commit #$STABLE_COMMIT"
+        git checkout $STABLE_COMMIT
     fi
 
     # remove build dir if it exists and start anew
@@ -223,7 +255,7 @@ function build_from_source() {
     done <<< "$(sudo cmake -L 2>/dev/null | grep BOOL)"
 
     # run checklist dialog
-    cmd=(dialog --clear --backtitle "Hyperion$tag Setup on Vero4K - Build from source" --title "BUILD OPTIONS" --checklist "Press SPACE to toggle options:" 15 40 7)
+    cmd=(dialog --clear --backtitle "Hyperion.ng Setup on Vero4K - Build from source" --title "BUILD OPTIONS" --checklist "Press SPACE to toggle options:" 15 40 7)
     exec 3>&1
     result=$("${cmd[@]}" "${options[@]}" 2>&1 1>&3)
     ret_val=$?
@@ -256,10 +288,10 @@ function build_from_source() {
 
     # check and get build dependancies
     waitbox "PROGRESS" "Checking for missing build dependancies"
-    depends_install ${build_depends[@]}
+    depends_install ${BUILD_DEPENDS[@]}
 
     # compile hyperion
-    waitbox "Compiling Hyperion$tag" "This will take quite a while, so I'll show you the output to keep you posted..."; sleep 2;
+    waitbox "Compiling Hyperion.ng" "This will take quite a while, so I'll show you the output to keep you posted..."; sleep 2;
     sudo rm -rf *
     ${buildcmd[@]}
     make -j4
@@ -272,8 +304,8 @@ function build_from_source() {
     mv *test* tests
 
     # Let's save SD card wear and only remove the system breakers. Will make rebuilds quicker too.
-    waitbox "Harmful Dependancies" "Uninstalling:\n${fatal_depends[@]}"
-    sudo apt-get remove -y ${fatal_depends[@]}
+    waitbox "Harmful Dependancies" "Uninstalling:\n${FATAL_DEPENDS[@]}"
+    sudo apt-get remove -y ${FATAL_DEPENDS[@]}
     sudo apt-get autoremove -y
 
     # install everything
@@ -284,7 +316,7 @@ function build_from_source() {
 
 function uninstall() {
     # chance to back out
-    if (! dialog --backtitle "Hyperion$tag Setup on Vero4K - Uninstall" --title "PROCEED?" --defaultno --no-label "Abort" --yesno "This will delete all installed binaries and effects." 0 0); then
+    if (! dialog --backtitle "Hyperion.ng Setup on Vero4K - Uninstall" --title "PROCEED?" --defaultno --no-label "Abort" --yesno "This will delete all installed binaries and effects." 0 0); then
         return
     fi
 
@@ -302,84 +334,37 @@ function uninstall() {
     waitbox "PROGRESS" "Hyperion service unregistered"
 
     # retain configs?
-    if (dialog --backtitle "Hyperion$tag Setup on Vero4K - Uninstall" --title "CONFIGURATION FILES!" --defaultno --yes-label "Delete" --no-label "Keep" --yesno "Would you like to DELETE the config files as well?" 0 0); then
+    if (dialog --backtitle "Hyperion.ng Setup on Vero4K - Uninstall" --title "CONFIGURATION FILES!" --defaultno --yes-label "Delete" --no-label "Keep" --yesno "Would you like to DELETE the config files as well?" 0 0); then
         # delete configs
-        sudo rm -r /etc/hyperion
+        sudo rm -r /home/osmc/.hyperion
         waitbox "PROGRESS" "Configuration files deleted"
     fi
-    dialog --backtitle "Hyperion$tag Setup on Vero4K - Uninstall" --title "PROGRESS" --msgbox "FINISHED!\n\nHyperion$tag has been uninstalled" 0 0
+    dialog --backtitle "Hyperion.ng Setup on Vero4K - Uninstall" --title "PROGRESS" --msgbox "FINISHED!\n\nHyperion.ng has been uninstalled" 0 0
 }
 
 
 function post_installation() {
-  dialog --title "Hyperion$tag: Post Installation Advice" \
+  dialog --title "Hyperion.ng: Post Installation Advice" \
     --no-collapse \
-    --msgbox \
-    "$post_advice" 0 0
-}
-
-
-function options_menu() {
-    while true; do
-        exec 3>&1
-        selection=$(dialog \
-            --backtitle "Hyperion$tag Setup on Vero4K" \
-            --title "Hyperion$tag" \
-            --clear \
-            --cancel-label "Back" \
-            --item-help \
-            --menu "Please select:" 0 0 4 \
-            "1" "Install from binary" "Install from binary" \
-            "2" "Build from source" "Build from source" \
-            "3" "Uninstall" "Uninstall" \
-            "4" "Post Installation" "Post Installation" \
-            2>&1 1>&3)
-        ret_val=$?
-        exec 3>&-
-
-        case $ret_val in
-            $DIALOG_CANCEL)
-                clear
-                break
-                ;;
-            $DIALOG_ESC)
-                clear
-                break
-                ;;
-        esac
-
-        case $selection in
-            0 )
-                clear
-                echo "Program terminated @004." #004
-                ;;
-            1 )
-                dialog --backtitle "Hyperion$tag Setup on Vero4K - Install from binary" --title "Advice" --msgbox \
-"This will install a prebuilt version of Hyperion$tag with all of the Vero4K compatible compilation options enabled.\n
+    --msgbox "Please refer to the Hyperion wiki for configuration advice.\n
+https://hyperion-project.org/wiki/Main\n
 \n
-Of course this will use a little more file space and possibly more CPU resources, for features you may not need.\n
-\n\
-It will also be an older version, so consider building from source once you've tried things out." 0 0
-
-                if (dialog --backtitle "Hyperion$tag Setup on Vero4K - Install from binary" --title "PROCEED?" --defaultno --no-label "Abort" --yesno "This will delete any previous build files and folders you may have.\n\nIt will attempt to preserve old configs..." 0 0); then
-                    cd $REPO_DIR/hyperion_$edition/prebuilt_$edition
-                    install_relative
-                fi
-                ;;
-            2 )
-                dialog --backtitle "Hyperion$tag Setup on Vero4K - Build from source" --title "Advice" --msgbox "$build_advice" 0 0
-                cd $REPO_DIR/hyperion_$edition
-                build_from_source
-                ;;
-            3 )
-                uninstall
-                ;;
-            4 )
-                post_installation
-                ;;
-        esac
-    done
+There is also some experience on the OSMC forum, specifically the \"OSMC and Hyperion\" thread in the Vero4k section.\n
+\n
+The configuration file is /home/osmc/.hyperion/config/hyperion_main.json\n
+It could be edited manually; but the web based GUI is recommended on port :8090 of your server for all configuration.\n
+\n
+It should be possible to start/stop the Hyperion daemon server with:\n
+sudo systemctl <start/stop> hyperion.service\n
+\n
+Make the daemon server start automatically at boot with:\n
+sudo systemctl <enable/disable> hyperion.service\n
+\n
+The Hyperion Remote control app in the Google Play Store now appears to be working with ng again.\n
+There is also an experimental app you can try from:\n
+https://github.com/BioHaZard1/hyperion-android" 0 0
 }
+
 
 
 ####################
@@ -400,14 +385,16 @@ fi
 while true; do
     exec 3>&1
     selection=$(dialog \
-        --backtitle "Hyperion Setup on Vero4K - Main Menu" \
-        --title "Main Menu" \
+        --backtitle "Hyperion.ng Setup on Vero4K" \
+        --title "Hyperion.ng" \
         --clear \
-        --cancel-label "Exit" \
+        --cancel-label "Quit" \
         --item-help \
-        --menu "Please select:" 0 0 2 \
-        "1" "Hyperion \"classic\"" "The original version of Hyperion." \
-        "2" "Hyperion.ng" "The beta development version of Hyperion.  Fun fact: \".ng\" stands for Next Generation.  I did not know that." \
+        --menu "Please select:" 0 0 4 \
+        "1" "Install from binary" "Install from binary" \
+        "2" "Build from source" "Build from source" \
+        "3" "Uninstall" "Uninstall" \
+        "4" "Post Installation" "Post Installation" \
         2>&1 1>&3)
     ret_val=$?
     exec 3>&-
@@ -431,89 +418,16 @@ while true; do
             echo "Program terminated."
             ;;
         1 )
-            # configure installer for hyperion "classic"
-            edition='classic'
-            tag=' "classic"'
-            build_depends=(qt5-default libusb-1.0-0-dev libpython3.5-dev)
-            run_depends=(libqt5core5a libqt5gui5 libqt5widgets5 libqt5network5 libusb-1.0-0 libpython3.5)
-            fatal_depends=(qt5-default)
-            systemd_unit='hyperion.systemd.sh'
-            repo_url='https://github.com/hyperion-project/hyperion.git'
-
-            build_advice='This software is intended for the Vero4K running OSMC, therefore options relating to:\n
-\n
-  1. The Raspberry Pi (dispmanx),\n
-  2. An X environment,\n
-  3. An Apple/OSX setup\n
-\n
-are unsupported - likely failing to build.\n
-\n
-*** You are recommended at this time to ENABLE QT5 ***\n
-\n
-Feel free to use this script as a starting point for your own installer on another platform.  This is open-source afterall.'
-
-            post_advice='Please refer to the Hyperion wiki for configuration advice.\n
-https://hyperion-project.org/wiki/Main\n
-\n
-The configuration file is in /etc/hyperion/\n
-Although it can be edited manually the Java based GUI is recommended:\n
-hypercon.jar (try SourceForge)\n
-\n
-It should be possible to start/stop the Hyperion daemon server with:\n
-sudo systemctl <start/stop> hyperion.service\n
-\n
-Make the daemon server start automatically at boot with:\n
-sudo systemctl <enable/disable> hyperion.service\n
-\n
-Also look out for the Hyperion remote control app in the Google Play Store.'
-
-            options_menu
+			install_from_binary
             ;;
         2 )
-            # configure installer for hyperion.ng
-            edition='nextgen'
-            tag='.ng'
-            build_depends=(vero3-userland-dev-osmc qtbase5-dev libqt5serialport5-dev libusb-1.0-0-dev libpython3.5-dev libxrender-dev libavahi-core-dev libavahi-compat-libdnssd-dev libmbedtls-dev libpcre3-dev zlib1g-dev libjpeg-dev libqt5sql5-sqlite)
-            run_depends=(libqt5concurrent5 libqt5core5a libqt5dbus5 libqt5gui5 libqt5network5 libqt5printsupport5 libqt5serialport5 libqt5sql5 libqt5test5 libqt5widgets5 libqt5xml5 libusb-1.0-0 libpython3.5 qt5-qmake)
-            fatal_depends=(libegl1-mesa)
-            systemd_unit='hyperion.systemd'
-            repo_url='https://github.com/hyperion-project/hyperion.ng.git'
-
-            build_advice='This software is intended for the Vero4K running OSMC, therefore options relating to:\n
-\n
-  1. The Raspberry Pi (dispmanx),\n
-  2. An X environment,\n
-  3. An Apple/OSX setup\n
-\n
-are unsupported - likely failing to build.\n
-\n
-You are recommended at this time to:\n
-   ENABLE QT5\n
-   DISABLE Tests\n
-   DISABLE V4L2\n
-\n
-Feel free to use this script as a starting point for your own installer on another platform.  This is open-source afterall.'
-
-            post_advice='Please refer to the Hyperion wiki for configuration advice.\n
-https://hyperion-project.org/wiki/Main\n
-\n
-There is also some experience on the OSMC forum, specifically the "OSMC and Hyperion" thread in the Vero4k section.\n
-\n
-The configuration file is in /etc/hyperion/\n
-Although it can be edited manually the web based GUI is recommended on port :8090 of your server.\n
-\n
-It should be possible to start/stop the Hyperion daemon server with:\n
-sudo systemctl <start/stop> hyperion.service\n
-\n
-Make the daemon server start automatically at boot with:\n
-sudo systemctl <enable/disable> hyperion.service\n
-\n
-The Hyperion Remote control app in the Google Play Store now appears to be working with ng again.\n
-There is also an experimental app you can try from:\n
-https://github.com/BioHaZard1/hyperion-android'
-
-            options_menu
-        ;;
+            build_from_source
+            ;;
+        3 )
+            uninstall
+            ;;
+        4 )
+			post_installation
+            ;;
     esac
 done
-
