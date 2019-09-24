@@ -1,5 +1,8 @@
 # hyperion-vero4k
-* Install Hyperion.ng (next gen) from binaries
+Specific to the OSMC box "Vero4K".
+
+Provides:
+* Installer for Hyperion.ng (next gen) from binaries
 * Custom build from source.
 * Dialog based command-line GUI
 
