@@ -1,5 +1,5 @@
 # hyperion-vero4k
-* Install Hyperion "classic" or "ng" from binaries
+* Install Hyperion.ng (next gen) from binaries
 * Custom build from source.
 * Dialog based command-line GUI
 
@@ -23,23 +23,16 @@ This software is intended for the Vero4K running OSMC, therefore options relatin
 are unsupported - likely failing to build.
 
 **You are recommended at this time to: **
-** ENABLE QT5**
-** DISABLE V4L2**
-** DISABLE Tests**
+   ENABLE AMLOGIC
+   ENABLE FB
+
+   DISABLE Tests
+   DISABLE V4L2
+   and everything else to be honest.
 ```
 ---
 # Post install
-You can manually edit the config file at `/etc/hyperion/` or better yet use:
-
----
-For "classic":
-* The GUI hypercon.jar  
-https://sourceforge.net/projects/hyperion-project/
-* The official Android remote available from the Google Play Store  
-https://play.google.com/store/apps/details?id=nl.hyperion.hyperionfree
-
----
-For "ng":
+You can manually edit the config file at `/home/osmc/.hyperion/config/` or better yet use:
 * The built-in web GUI  
 \<your.server.ip.address:8090\>
 * The official Android remote now appears to be working again for ng too!  
