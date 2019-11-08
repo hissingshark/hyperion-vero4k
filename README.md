@@ -35,8 +35,7 @@ are unsupported - likely failing to build.
 ```
 ---
 # Post install
-You can manually edit the config file at `/home/osmc/.hyperion/config/` or better yet use:
-* The built-in web GUI  
+Edit the configuration using the built-in web GUI:  
 \<your.server.ip.address:8090\>
 * The official Android remote now appears to be working again for ng too!  
 https://play.google.com/store/apps/details?id=nl.hyperion.hyperionfree
