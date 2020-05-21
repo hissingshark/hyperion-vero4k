@@ -22,7 +22,7 @@ DIALOG_ESC=255
 REPO_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 CUSTOM_COMMIT=$1
 # STABLE_COMMIT='b1b2079' # when the a/v sync bug with amvideocap device was fixed
-STABLE_COMMIT='380f9b5' #  looks good
+STABLE_COMMIT='e796155' #  looks good
 SYSTEMD_UNIT='hyperion.systemd'
 REPO_URL='https://github.com/hyperion-project/hyperion.ng.git'
 
