@@ -28,9 +28,9 @@ are unsupported - likely failing to build.
 **You are recommended at this time to: **
    ENABLE AMLOGIC
    ENABLE FB
+   ENABLE V4L2
 
    DISABLE Tests
-   DISABLE V4L2
    and everything else to be honest.
 ```
 ---
