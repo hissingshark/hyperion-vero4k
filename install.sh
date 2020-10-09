@@ -184,9 +184,9 @@ are unsupported - likely failing to build.\n
 You are recommended at this time to:\n
    ENABLE AMLOGIC\n
    ENABLE FB\n
+   ENABLE V4L2\n
 \n
    DISABLE Tests\n
-   DISABLE V4L2\n
    and everything else to be honest.\n
 \n
 Feel free to use this script as a starting point for your own installer on another platform.  This is open-source afterall." 0 0
