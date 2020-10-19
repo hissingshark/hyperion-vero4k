@@ -26,9 +26,9 @@ STABLE_COMMIT='e796155' #  looks good
 SYSTEMD_UNIT='hyperion.systemd'
 REPO_URL='https://github.com/hyperion-project/hyperion.ng.git'
 
-declare -a PREBUILD_DEPENDS=(git cmake build-essential python3.5)
-declare -a BUILD_DEPENDS=(vero3-userland-dev-osmc qtbase5-dev libqt5serialport5-dev libusb-1.0-0-dev libpython3.5-dev libxrender-dev libavahi-core-dev libavahi-compat-libdnssd-dev libmbedtls-dev libpcre3-dev zlib1g-dev libjpeg-dev libqt5sql5-sqlite libssl-dev)
-declare -a RUN_DEPENDS=(libqt5concurrent5 libqt5core5a libqt5dbus5 libqt5gui5 libqt5network5 libqt5printsupport5 libqt5serialport5 libqt5sql5 libqt5test5 libqt5widgets5 libqt5xml5 libusb-1.0-0 libpython3.5 qt5-qmake libqt5sql5-sqlite)
+declare -a PREBUILD_DEPENDS=(git cmake build-essential python3.7)
+declare -a BUILD_DEPENDS=(vero3-userland-dev-osmc qtbase5-dev libqt5serialport5-dev libusb-1.0-0-dev libpython3.7-dev libxrender-dev libavahi-core-dev libavahi-compat-libdnssd-dev libmbedtls-dev libpcre3-dev zlib1g-dev libjpeg-dev libqt5sql5-sqlite libssl-dev)
+declare -a RUN_DEPENDS=(libqt5concurrent5 libqt5core5a libqt5dbus5 libqt5gui5 libqt5network5 libqt5printsupport5 libqt5serialport5 libqt5sql5 libqt5test5 libqt5widgets5 libqt5xml5 libusb-1.0-0 libpython3.7 qt5-qmake libqt5sql5-sqlite)
 declare -a FATAL_DEPENDS=(libegl1-mesa)
 declare -a LINK_LIST=(/usr/bin/flatc /usr/bin/flathash /usr/bin/gpio2spi /usr/bin/hyperion-aml /usr/bin/hyperion-framebuffer /usr/bin/hyperion-remote /usr/bin/hyperion-v4l2 /usr/bin/hyperiond /usr/bin/protoc)
 
@@ -253,7 +253,7 @@ However, if you experience problems with your cutting edge build it might be wor
         tmp=($(echo $line | cut -d ':' -f 1))
         flags+=("$tmp")
         options+=("${#flags[@]}" "$tmp" "off")
-    done <<< "$(sudo cmake -L 2>/dev/null | grep BOOL)"
+    done <<< "$(sudo cmake -L 2>/dev/null | grep "^ENABLE" | grep "BOOL")"
 
     # run checklist dialog
     cmd=(dialog --clear --backtitle "Hyperion.ng Setup on Vero4K - Build from source" --title "BUILD OPTIONS" --checklist "Press SPACE to toggle options:" 15 40 7)
