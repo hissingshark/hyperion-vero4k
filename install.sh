@@ -28,7 +28,7 @@ REPO_URL='https://github.com/hyperion-project/hyperion.ng.git'
 
 declare -a PREBUILD_DEPENDS=(git cmake build-essential python3.7 libpython3.7-dev)
 declare -a BUILD_DEPENDS=(vero3-userland-dev-osmc qtbase5-dev libqt5serialport5-dev libusb-1.0-0-dev libxrender-dev libavahi-core-dev libavahi-compat-libdnssd-dev libmbedtls-dev libpcre3-dev zlib1g-dev libjpeg-dev libqt5sql5-sqlite libssl-dev)
-declare -a RUN_DEPENDS=(libqt5concurrent5 libqt5core5a libqt5dbus5 libqt5gui5 libqt5network5 libqt5printsupport5 libqt5serialport5 libqt5sql5 libqt5test5 libqt5widgets5 libqt5xml5 libusb-1.0-0 libpython3.7 qt5-qmake libqt5sql5-sqlite)
+declare -a RUN_DEPENDS=(libqt5concurrent5 libqt5core5a libqt5dbus5 libqt5gui5 libqt5network5 libqt5printsupport5 libqt5serialport5 libqt5sql5 libqt5test5 libqt5widgets5 libqt5xml5 libusb-1.0-0 libpython3.7 qt5-qmake libqt5sql5-sqlite libpcre16-3)
 declare -a FATAL_DEPENDS=(libegl1-mesa)
 declare -a LINK_LIST=(/usr/bin/flatc /usr/bin/flathash /usr/bin/gpio2spi /usr/bin/hyperion-aml /usr/bin/hyperion-framebuffer /usr/bin/hyperion-remote /usr/bin/hyperion-v4l2 /usr/bin/hyperiond /usr/bin/protoc)
 
