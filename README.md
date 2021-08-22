@@ -29,6 +29,7 @@ are unsupported - likely failing to build.
    ENABLE AMLOGIC
    ENABLE FB
    ENABLE V4L2
+   ENABLE USB_HID
 
    DISABLE Tests
    and everything else to be honest.
