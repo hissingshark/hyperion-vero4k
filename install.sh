@@ -184,6 +184,17 @@ You are recommended at this time to:\n
    ENABLE AMLOGIC\n
    ENABLE FB\n
    ENABLE V4L2\n
+
+   ENABLE_FLATBUF_SERVER
+   ENABLE_PROTOBUF_SERVER
+   ENABLE_FORWARDER
+
+   ENABLE_DEV_NETWORK
+   ENABLE_DEV_SERIAL
+   ENABLE DEV_USB_HID
+
+   ENABLE_EFFECTENGINE
+   ENABLE_REMOTE_CTL
 \n
    DISABLE Tests\n
    and everything else to be honest.\n

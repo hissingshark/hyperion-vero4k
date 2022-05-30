@@ -29,7 +29,17 @@ are unsupported - likely failing to build.
    ENABLE AMLOGIC
    ENABLE FB
    ENABLE V4L2
-   ENABLE USB_HID
+
+   ENABLE_FLATBUF_SERVER
+   ENABLE_PROTOBUF_SERVER
+   ENABLE_FORWARDER
+
+   ENABLE_DEV_NETWORK
+   ENABLE_DEV_SERIAL
+   ENABLE DEV_USB_HID
+
+   ENABLE_EFFECTENGINE
+   ENABLE_REMOTE_CTL
 
    DISABLE Tests
    and everything else to be honest.
