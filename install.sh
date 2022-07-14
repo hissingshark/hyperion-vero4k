@@ -21,7 +21,7 @@ DIALOG_ESC=255
 
 REPO_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 CUSTOM_COMMIT=$1
-STABLE_COMMIT='8a02832' #  alpha-9 and a bit
+STABLE_COMMIT='5dc696b' # v2.0.13
 SYSTEMD_UNIT='hyperion.systemd'
 REPO_URL='https://github.com/hyperion-project/hyperion.ng.git'
 
@@ -185,16 +185,17 @@ You are recommended at this time to:\n
    ENABLE FB\n
    ENABLE V4L2\n
 
-   ENABLE_FLATBUF_SERVER
-   ENABLE_PROTOBUF_SERVER
-   ENABLE_FORWARDER
+   ENABLE FLATBUF_SERVER
+   ENABLE PROTOBUF_SERVER
+   ENABLE FORWARDER
+   ENABLE BOBLIGHT_SERVER
 
-   ENABLE_DEV_NETWORK
-   ENABLE_DEV_SERIAL
+   ENABLE DEV_NETWORK
+   ENABLE DEV_SERIAL
    ENABLE DEV_USB_HID
 
-   ENABLE_EFFECTENGINE
-   ENABLE_REMOTE_CTL
+   ENABLE EFFECTENGINE
+   ENABLE REMOTE_CTL
 \n
    DISABLE Tests\n
    and everything else to be honest.\n
