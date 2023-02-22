@@ -135,7 +135,7 @@ function install_relative() {
     sudo mkdir -p /usr/share/hyperion/bin
     cp -r tests /usr/share/hyperion
     # in keeping with hyperion's own installer, symlinks to bins, and the service has a "working directory" of /usr/share/hyperion/bin
-    sudo cp * /usr/share/hyperion/bin
+    sudo cp -r * /usr/share/hyperion/bin
     # delete existing bin syslinks first in case there are fewer to be added
     sudo rm  ${LINK_LIST[@]}
     ln -sf /usr/share/hyperion/bin/* /usr/bin/
@@ -146,7 +146,7 @@ function install_relative() {
     waitbox "PROGRESS" "Installing effects"
     go ../../effects
     sudo mkdir /usr/share/hyperion/effects
-    sudo cp * /usr/share/hyperion/effects
+    sudo cp -r * /usr/share/hyperion/effects
 
     # copy over systemd script and register
     waitbox "PROGRESS" "Registering hyperion service"
