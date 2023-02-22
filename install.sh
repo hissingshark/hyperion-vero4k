@@ -21,7 +21,7 @@ DIALOG_ESC=255
 
 REPO_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 CUSTOM_COMMIT=$1
-STABLE_COMMIT='5dc696b' # v2.0.13
+STABLE_COMMIT='24a00e3' # v2.0.15
 SYSTEMD_UNIT='hyperion.systemd'
 REPO_URL='https://github.com/hyperion-project/hyperion.ng.git'
 
