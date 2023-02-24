@@ -123,6 +123,22 @@ However, if you experience problems with your cutting edge build it might be wor
 }
 
 
+function install_from_source() {
+    dialog --backtitle "Hyperion.ng Setup on Vero4K - Install from binary" --title "Advice" --msgbox \
+"This will install the last version of Hyperion.ng built here from the build from source option." 0 0
+
+    if (dialog --backtitle "Hyperion.ng Setup on Vero4K - Install from built binary" --title "PROCEED?" --defaultno --no-label "Abort" --yesno \
+	  "This will delete any previous build files and folders you may have.\n
+\n
+It will not remove any old configs.  This will save you time if everything is working as it should.\n
+\n
+However, if you experience problems with your cutting edge build it might be worth running an uninstall first to delete them - in case the developers have changed something about how they work..." 0 0); then
+        cd $REPO_DIR/source
+        install_relative
+    fi
+}
+
+
 function install_relative() {
     # most operations will be relative to the current working directory, so must be set correctly before calling
 
@@ -203,11 +219,7 @@ You are recommended at this time to:\n
 Feel free to use this script as a starting point for your own installer on another platform.  This is open-source afterall." 0 0
 
     if (! dialog --backtitle "Hyperion.ng Setup on Vero4K - Build from source" --title "PROCEED?" --defaultno --no-label "Abort" --yesno \
-	  "This will delete any previous build files and folders you may have.\n
-\n
-It will not remove any old configs.  This will save you time if everything is working as it should.\n
-\n
-However, if you experience problems with your cutting edge build it might be worth running an uninstall first to delete them - in case the developers have changed something about how they work..." 0 0); then
+	  "This will delete any previous build files and folders you may have." 0 0); then
         return
     fi
 
@@ -320,9 +332,7 @@ However, if you experience problems with your cutting edge build it might be wor
     sudo apt-get remove -y ${FATAL_DEPENDS[@]}
     sudo apt-get autoremove -y
 
-    # install everything
-    cd ../..
-    install_relative
+    dialog --backtitle "Hyperion.ng Setup on Vero4K - Build from source" --title "PROGRESS" --msgbox "BUILD COMPLETE!\n\nInstall Hyperion.ng from the next menu option." 0 0
 }
 
 
@@ -405,8 +415,9 @@ while true; do
         --menu "Please select:" 0 0 4 \
         "1" "Install from binary" "Install from binary" \
         "2" "Build from source" "Build from source" \
-        "3" "Uninstall" "Uninstall" \
-        "4" "Post Installation" "Post Installation" \
+        "3" "Install from last source build" "Installs from the last source build if there was one" \
+        "4" "Uninstall" "Uninstall" \
+        "5" "Post Installation" "Post Installation" \
         2>&1 1>&3)
     ret_val=$?
     exec 3>&-
@@ -430,15 +441,18 @@ while true; do
             echo "Program terminated."
             ;;
         1 )
-			install_from_binary
+			      install_from_binary
             ;;
         2 )
             build_from_source
             ;;
         3 )
-            uninstall
+			      install_from_source
             ;;
         4 )
+            uninstall
+            ;;
+        5 )
 			post_installation
             ;;
     esac
