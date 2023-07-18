@@ -387,6 +387,17 @@ There is also an experimental app you can try from:\n
 https://github.com/BioHaZard1/hyperion-android" 0 0
 }
 
+function update() {
+  # reset to latest upstream version instead of pulling, to handle local contamination/divergence
+  su osmc -c -- 'git fetch'
+  su osmc -c -- 'git reset --hard origin/master'
+
+  # restart from new version of installer
+  sudo ../hyperion-vero4k/install.sh
+
+  # and kill this one
+  exit 0
+}
 
 
 ####################
@@ -418,6 +429,7 @@ while true; do
         "3" "Install from last source build" "Installs from the last source build if there was one" \
         "4" "Uninstall" "Uninstall" \
         "5" "Post Installation" "Post Installation" \
+        "6" "Update" "Updates this installer" \
         2>&1 1>&3)
     ret_val=$?
     exec 3>&-
@@ -453,7 +465,10 @@ while true; do
             uninstall
             ;;
         5 )
-			post_installation
+            post_installation
+            ;;
+        6 )
+            update
             ;;
     esac
 done
